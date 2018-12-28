@@ -1,0 +1,55 @@
+
+encoders:
+  aac:
+  - afconvert -d aac -q %(quality)s -b %(bitrate)s --soundcheck-generate -f m4af %(inputfile)s %(outputfile)s
+  - neroAacEnc -if %(inputfile)s -of %(outputfile)s -br %(bitrate)s -2pass
+  aif:
+  - afconvert -f AIFF -d BEI%(sample_bits)s %(inputfile)s %(outputfile)s
+  alac:
+  - afconvert -d alac %(inputfile)s %(outputfile)s
+  caf:
+  - afconvert -f caff -d LEI%(sample_bits)s %(inputfile)s %(outputfile)s
+  flac:
+  - flac -f --silent --verify --replay-gain --best -o %(outputfile)s %(inputfile)s
+  mp3:
+  - lame --quiet -b %(bitrate)s --vbr-new -ms --replaygain-accurate %(inputfile)s
+    %(outputfile)s
+  - afconvert -b %(bitrate)s -d mp3 %(inputfile)s %(outputfile)s
+  opus:
+  - opusenc --quiet %(inputfile)s %(outputfile)s
+  vorbis:
+  - oggenc --quiet -q %(quality)s -o %(outputfile)s %(inputfile)s
+  wav:
+  - afconvert -f WAVE -d LEI%(sample_bits)s %(inputfile)s %(outputfile)s
+  wavpack:
+  - wavpack -qhx %(inputfile)s -o %(outputfile)s
+
+decoders:
+  aac:
+  - afconvert -f WAVE -d LEI16 %(inputfile)s %(outputfile)s
+  - neroAacDec -if %(outputfile)s -of %(inputfile)s
+  - faad -q -o %(outputfile)s %(inputfile)s -b1
+  aif:
+  - afconvert -f WAVE -d LEI16 %(inputfile)s %(outputfile)s
+  alac:
+  - afconvert -f WAVE -d LEI16 %(inputfile)s %(outputfile)s
+  caf:
+  - afconvert -f WAVE -d LEI16 %(inputfile)s %(outputfile)s
+  flac:
+  - flac -f --silent --decode -o %(outputfile)s %(inputfile)s
+  mp3:
+  - lame --quiet --decode %(inputfile)s %(outputfile)s
+  opus:
+  - opusdec --quiet %(inputfile)s %(outputfile)s
+  vorbis:
+  - oggdec --quiet -o %(outputfile)s %(inputfile)s
+  wav:
+  - cp %(inputfile)s %(outputfile)s
+  wavpack:
+  - wvunpack -yq %(inputfile)s -o %(outputfile)s
+
+testers:
+  aac:
+  - afconvert -f WAVE -d LEI16 %(inputfile)s %(outputfile)s
+  flac:
+  - flac --silent --test %(inputfile)s

@@ -1,0 +1,5 @@
+
+trees:
+  - path: ~/Music
+    description: Music in home directory
+

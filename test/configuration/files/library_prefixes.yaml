@@ -1,0 +1,11 @@
+
+library:
+    trees:
+    - prefixes:
+      - /tmp/test-prefix-1
+      - /tmp/test-prefix-2
+      formats:
+      - aac
+      - mp3
+      description: Temporary test library
+

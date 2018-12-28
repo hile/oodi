@@ -1,0 +1,7 @@
+
+codecs:
+  aac:
+    bitrate: 123456
+
+  encoders:
+    wav: []

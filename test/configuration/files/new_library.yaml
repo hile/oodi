@@ -1,0 +1,8 @@
+
+library:
+    trees:
+    - path: /tmp/testlibrary
+      formats:
+      - aac
+      - mp3
+
