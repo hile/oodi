@@ -21,7 +21,6 @@ setup(
     install_requires=(
         'mutagen',
         'ruamel.yaml',
-        'multiprocessing',
         'systematic',
     ),
     tests_require=(

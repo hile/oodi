@@ -19,6 +19,7 @@ class Audiofile(GenericAudioFile):
     description = ' Apple Lossless Audio Codec'
     extensions = (
         'm4a',
+        'alac',
     )
     mimetypes = (
     )
