@@ -12,15 +12,41 @@ class Mp3ValueTotalTag(ValueTotalCountTag):
     """
     MP3 value total track argument pairs
     """
+    field = None
 
     def get(self):
+        """
+        Get MP3 numbering details
+        """
         try:
-            data = self.parser.__entry__[self.parser.fields['track_number'][0]].text[0].split('/')
+            data = self.parser.__entry__[self.field].text[0].split('/')
             self.value = int(data[0])
             self.total = int(data[1])
         except KeyError:
             self.value = None
             self.total = None
+
+    def save(self):
+        """
+        Save MP3 numbering details
+        """
+        if self.total is not None:
+            value = '{}/{}'.format(self.value, self.total)
+        else:
+            value = '{}/{}'.format(self.value, self.value)
+
+        self.parser.__entry__[self.field] = self.parser.__format_tag__(self.numbering_tag, value)
+        self.parser.__entry__.save()
+
+
+class MP3TrackNumberingTag(Mp3ValueTotalTag):
+    numbering_tag = 'track_number'
+    field = 'TRKN'
+
+
+class MP3DiskNumberingTag(Mp3ValueTotalTag):
+    numbering_tag = 'disk_number'
+    field = 'TPOS'
 
 
 class TagParser(BaseTagParser):
@@ -30,8 +56,8 @@ class TagParser(BaseTagParser):
     format = 'mp3'
     loader = MP3
     fields = TAG_FIELDS
-    track_numbering_class = Mp3ValueTotalTag
-    disk_numbering_class = Mp3ValueTotalTag
+    track_numbering_class = MP3TrackNumberingTag
+    disk_numbering_class = MP3DiskNumberingTag
 
     def __getattr__(self, attr):
         """
@@ -44,7 +70,7 @@ class TagParser(BaseTagParser):
 
     def __format_tag__(self, tag, value):
         """
-        Format tag as MP3 frame
+        Format tag as MP3 frame for saving
         """
         from mutagen.id3._specs import Encoding
 

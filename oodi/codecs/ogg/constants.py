@@ -14,6 +14,8 @@ TAG_FIELDS = {
     'publisher':            ['PUBLISHER'],
     'lyricist':             ['LYRICIST'],
     'album':                ['ALBUM'],
+    'opus':                 ['OPUS'],
+    'part':                 ['PART'],
     'title':                ['TITLE'],
     'part_number':          ['PARTNUMBER'],
     'genre':                ['GENRE'],
@@ -21,12 +23,11 @@ TAG_FIELDS = {
     'note':                 ['NOTE'],
     'description':          ['DESCRIPTION'],
     'location':             ['LOCATION'],
-    'year':                 ['DATE'],
+    'date':                 ['DATE'],
     'bpm':                  ['BPM'],
     'rating':               ['RATING'],
     'label':                ['LABEL'],
     'labelno':              ['LABELNO'],
-    'opus':                 ['OPUS'],
     'isrc':                 ['ISRC'],
     'ean':                  ['EAN/UPN'],
     'lyrics':               ['LYRICS'],
@@ -49,6 +50,22 @@ TAG_FIELDS = {
     'total_disks':          ['DISKNUMBER'],
     'album_art':            ['METADATA_BLOCK_PICTURE'],
 }
+
+LIST_FIELDS = (
+    'arranger',
+    'author',
+    'comment',
+    'composer',
+    'conductor',
+    'date',
+    'ensemble',
+    'genre',
+    'location',
+    'lyricist',
+    'part',
+    'part_number',
+    'performer',
+)
 
 INTERNAL_FIELDS = {
     'album_gain':           ['REPLAYGAIN_ALBUM_GAIN'],

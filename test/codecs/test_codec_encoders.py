@@ -28,12 +28,13 @@ class CodecEncoders(unittest.TestCase):
 
     def test_aac_encoder(self):
         from oodi.codecs.utils import detect_file_codec
+        from oodi.library.exceptions import LibraryError
         from oodi.library.track import Track
 
         filename = self.configuration.get_temporary_file_path('test.m4a')
 
-        # Raises ValueError because .m4a matches multiple codecs
-        with self.assertRaises(ValueError):
+        # Raises LibraryError because .m4a matches multiple codecs
+        with self.assertRaises(LibraryError):
             track = Track(self.configuration, filename)
             output_file = track.encode(self.input_file, remove_input_file=False)
 
@@ -58,12 +59,13 @@ class CodecEncoders(unittest.TestCase):
 
     def test_alac_encoder(self):
         from oodi.codecs.utils import detect_file_codec
+        from oodi.library.exceptions import LibraryError
         from oodi.library.track import Track
 
         filename = self.configuration.get_temporary_file_path('test.m4a')
 
-        # Raises ValueError because .alac matches multiple codecs
-        with self.assertRaises(ValueError):
+        # Raises LibraryError because .alac matches multiple codecs
+        with self.assertRaises(LibraryError):
             track = Track(self.configuration, filename)
             output_file = track.encode(self.input_file, remove_input_file=False)
 

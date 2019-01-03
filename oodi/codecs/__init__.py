@@ -145,10 +145,46 @@ class ValueTotalCountTag:
         self.value = None
         self.total = None
 
+    def set(self, attr, value):
+        """
+        Set metadata numbering value to local object
+
+        Formats and validates values and calls self.save() for codec specific saving
+        """
+        try:
+            _value, total = [int(x) for x in str(value).split('/', 1)]
+            if _value <= 0 or total <= 0:
+                raise ValueError('Invalid numbering tag value {}'.format(value))
+            self.value = _value
+            self.total = total
+        except ValueError:
+            try:
+                value = int(value)
+                if value <= 0:
+                    raise ValueError
+            except Exception:
+                raise ValueError('Invalid numbering tag value {}'.format(value))
+            if attr == 'value':
+                self.value = value
+            elif attr == 'total':
+                self.total = value
+
+        if self.value is None:
+            raise ValueError('Invalid numbering range {}/{}'.format(self.value, self.total))
+        if self.total is not None and self.value > self.total:
+            raise ValueError('Invalid numbering range {}/{}'.format(self.value, self.total))
+
+        self.save()
+
     def get(self):
         raise NotImplementedError
 
-    def set(self):
+    def save(self):
+        """
+        Save value / total fields to object.
+
+        This must be implemented in child class
+        """
         raise NotImplementedError
 
 
@@ -194,6 +230,9 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         except KeyError:
             raise AttributeError
 
+        if self.__entry__.tags is None:
+            return None
+
         for tag_attribute in tag_attributes:
             if tag_attribute in self.__entry__.tags:
                 value = self.__entry__.tags[tag_attribute]
@@ -202,16 +241,40 @@ class BaseTagParser(AudiofileProcessorBaseClass):
                 return value
         return None
 
+    def __update_numbering_tag__(self, tag, value):
+        """
+        Update value / total disk numbering tags
+        """
+        if tag == 'track_number':
+            self.track_numbering.set('value', value)
+        elif tag == 'total_tracks':
+            self.track_numbering.set('total', value)
+        elif tag == 'disk_number':
+            self.disk_numbering.set('value', value)
+        elif tag == 'total_disks':
+            self.disk_numbering.set('total', value)
+
     def __setattr__(self, attr, value):
         """
         Set tag value
         """
-        if attr in self.fields:
+        if attr in ('track_number', 'total_tracks', 'disk_number', 'total_disks'):
+            self.__update_numbering_tag__(attr, value)
+        elif attr in self.fields:
             tag = self.fields[attr][0]
             self.__entry__[tag] = self.__format_tag__(attr, value)
             self.__entry__.save()
         else:
             super().__setattr__(attr, value)
+
+    def __delattr__(self, attr):
+        """
+        Remove tag from tags
+        """
+        if attr in self.fields:
+            tag = self.fields[attr][0]
+            del(self.__entry__[tag])
+            self.__entry__.save()
 
     def __format_tag__(self, tag, value):
         """
@@ -221,22 +284,34 @@ class BaseTagParser(AudiofileProcessorBaseClass):
 
     @property
     def track_number(self):
-        self.track_numbering.get()
+        try:
+            self.track_numbering.get()
+        except NotImplementedError:
+            raise CodecError('{} track numbering not implemented'.format(self.__class__))
         return self.track_numbering.value
 
     @property
     def total_tracks(self):
-        self.track_numbering.get()
+        try:
+            self.track_numbering.get()
+        except NotImplementedError:
+            raise CodecError('{} track numbering not implemented'.format(self.__class__))
         return self.track_numbering.total
 
     @property
     def disk_number(self):
-        self.disk_numbering.get()
+        try:
+            self.disk_numbering.get()
+        except NotImplementedError:
+            raise CodecError('{} disk numbering not implemented'.format(self.__class__))
         return self.disk_numbering.value
 
     @property
     def total_disks(self):
-        self.disk_numbering.get()
+        try:
+            self.disk_numbering.get()
+        except NotImplementedError:
+            raise CodecError('{} disk numbering not implemented'.format(self.__class__))
         return self.disk_numbering.total
 
     @property

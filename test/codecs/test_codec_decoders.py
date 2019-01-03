@@ -38,6 +38,8 @@ class CodecDecoders(unittest.TestCase):
                 os.path.isfile(output_file),
                 'Error decoding {}: missing output file {}'.format(testfile, output_file)
             )
+            if track.supports_tags:
+                self.assertIsInstance(track.tags.items(), dict)
 
     def test_codec_decoders_explicit_output_file(self):
         """

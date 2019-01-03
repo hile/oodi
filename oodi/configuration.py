@@ -19,7 +19,9 @@ class ConfigurationError(Exception):
 
 class ConfigurationSection(dict):
     """
-    App specific configuration section
+    App module specific configuration section
+
+    Common parent class for codec, library etc configuration sections
     """
     defaults = os.path.join(__file__, 'defaults.yaml')
     default_configuration = {}
@@ -56,6 +58,12 @@ class Configuration:
     """
 
     def __init__(self, path=DEFAULT_CONFIG_PATH):
+        """
+        Load base configuration for oodi with codecs and libraries
+
+        Also loads given configuration file if available
+        """
+
         from .codecs.configuration import CodecConfiguration
         from .library.configuration import LibraryConfiguration
 
@@ -92,7 +100,9 @@ class Configuration:
 
     def load(self, path):
         """
-        Load configuration
+        Load specified configuration file
+
+        Also configures self.codecs and self.libraries child classes
         """
 
         data = {}

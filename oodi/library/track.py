@@ -3,6 +3,7 @@ import os
 import re
 
 from . import File
+from .exceptions import LibraryError
 
 # Regexp patterns to match track filenames
 TRACKNAME_PATTERNS = (
@@ -70,13 +71,13 @@ class Track(File):
         """
         Return relative path to library
 
-        Raises ValueError if file is not linked to a tree
+        Raises LibraryError if file is not linked to a tree
         """
         if self.tree is not None:
             prefix = '{}/'.format(self.tree.path)
             return self.path[len(prefix):].lstrip('/')
         else:
-            raise ValueError('File {} is not linked to a tree'.format(self.path))
+            raise LibraryError('File {} is not linked to a tree'.format(self.path))
 
     @property
     def codec(self):
@@ -89,7 +90,7 @@ class Track(File):
             for codec in codecs:
                 if codec.format == self.format:
                     return codec
-            raise ValueError('Unknown format: {}'.format(self.format))
+            raise LibraryError('Unknown format: {}'.format(self.format))
         elif self.extension:
             codecs = self.configuration.codecs.find_codecs_for_extension(self.extension)
             if len(codecs) == 1:
@@ -105,9 +106,16 @@ class Track(File):
                         for codec in codecs:
                             if codec.format == self.format:
                                 return codec
-                    raise ValueError('Extension {} matches multiple codecs'.format(self))
+                    raise LibraryError('Extension {} matches multiple codecs'.format(self))
         else:
-            raise ValueError('Filename has no extension:{}'.format(self.path))
+            raise LibraryError('Filename has no extension:{}'.format(self.path))
+
+    @property
+    def supports_tags(self):
+        """
+        Boolean flag to check if format supports tagging
+        """
+        return self.codec.tagparser_class is not None
 
     @property
     def tags(self):
@@ -162,7 +170,7 @@ class Track(File):
         if decoder:
             return decoder.decode(self.path, output_file, *args, **kwargs)
         else:
-            raise ValueError('Codec has no decoder')
+            raise LibraryError('Codec has no decoder')
 
     def encode(self, input_file, *args, **kwargs):
         """
@@ -172,7 +180,7 @@ class Track(File):
         if encoder:
             return encoder.encode(input_file, self.path, *args, **kwargs)
         else:
-            raise ValueError('Codec has no encoder')
+            raise LibraryError('Codec has no encoder')
 
     def test(self, *args, **kwargs):
         """
@@ -182,4 +190,4 @@ class Track(File):
         if tester:
             return tester.test(self.path, *args, **kwargs)
         else:
-            raise ValueError('Codec has no tester')
+            raise LibraryError('Codec has no format tester')

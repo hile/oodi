@@ -18,6 +18,17 @@ class MP4ValueTotalTag(ValueTotalCountTag):
             self.value = None
             self.total = None
 
+    def save(self):
+        """
+        Save numbering tag value
+
+        If self.total is not set, set it to value
+        """
+        if self.value is not None and self.total is None:
+            self.total = self.value
+        self.parser.__entry__[self.tag] = [(self.value, self.total)]
+        self.parser.__entry__.save()
+
 
 class MP4TagParser(BaseTagParser):
     """

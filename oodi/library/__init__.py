@@ -283,13 +283,13 @@ class Libraries:
 
     def add_tree(self, path, description=None, formats=list):
         """
-        Add tree to configuration
+        Add tree to libraries configuration
         """
         from oodi.library.tree import Tree
 
         for item in self.trees:
             if item.path == path:
-                raise ValueError('Tree already in library: {}'.format(path))
+                raise LibraryError('Tree already in library: {}'.format(path))
 
         self.trees.append(Tree(
             self.configuration,
@@ -301,9 +301,9 @@ class Libraries:
 
     def remove_tree(self, path):
         """
-        Remove tree from configuration.
+        Remove tree from libraries configuration
 
-        Does not remove files in directory.
+        Does not remove any directorieos or files in filesystem
         """
         matches = []
         for tree in self.trees:
@@ -312,7 +312,7 @@ class Libraries:
                 self.trees.remove(tree)
 
         if not matches:
-            raise ValueError('Tree was found not in library: {}'.format(path))
+            raise LibraryError('Tree was found not in library: {}'.format(path))
 
     def find_tree_by_prefix(self, path):
         """

@@ -1,0 +1,7 @@
+
+library:
+    trees:
+    - path: /tmp/test-invalid-formats
+      formats:
+      - notsupported
+      - aac

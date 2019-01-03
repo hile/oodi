@@ -22,7 +22,7 @@ encoders:
   wav:
   - afconvert -f WAVE -d LEI%(sample_bits)s %(inputfile)s %(outputfile)s
   wavpack:
-  - wavpack -qhx %(inputfile)s -o %(outputfile)s
+  - wavpack -w Encoder -w Settings -qhx %(inputfile)s -o %(outputfile)s
 
 decoders:
   aac:
