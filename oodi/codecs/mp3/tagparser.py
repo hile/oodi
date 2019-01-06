@@ -49,6 +49,42 @@ class MP3DiskNumberingTag(Mp3ValueTotalTag):
     field = 'TPOS'
 
 
+class MP3CommentTag:
+    """
+    MP3 comment with language code 'eng'
+    """
+    def __init__(self, parser, lang='eng'):
+        self.parser = parser
+        self.lang = lang
+        self.__tag__ = 'COMM::{}'.format(self.lang)
+
+    @property
+    def value(self):
+        try:
+            return self.parser.__entry__[self.__tag__].text[0]
+        except KeyError:
+            return None
+
+    @value.setter
+    def value(self, value):
+        from mutagen.id3._specs import Encoding
+        from mutagen.id3 import COMM
+        self.parser.__entry__[self.__tag__] = COMM(
+            encoding=Encoding.UTF8,
+            lang=self.lang,
+            text=value
+        )
+        self.parser.__entry__.save()
+
+    def delete(self):
+        """
+        Delete comment tag from file if defined
+        """
+        if self.value:
+            del self.parser.__entry__[self.__tag__]
+            self.parser.__entry__.save()
+
+
 class TagParser(BaseTagParser):
     """
     MP3 tag processor
@@ -59,14 +95,32 @@ class TagParser(BaseTagParser):
     track_numbering_class = MP3TrackNumberingTag
     disk_numbering_class = MP3DiskNumberingTag
 
+    def __delattr__(self, attr):
+        """
+        Delete AIFF tags
+        """
+        if attr == 'comment':
+            MP3CommentTag(self).delete()
+        else:
+            return super().__delattr__(attr)
+
     def __getattr__(self, attr):
+        if attr == 'comment':
+            return MP3CommentTag(self).value
+        else:
+            value = super().__getattr__(attr)
+            if value is not None:
+                return value.text[0]
+        return None
+
+    def __setattr__(self, attr, value):
         """
-        Get mp3 tag attribute and decode frame
+        Set MP3 tags
         """
-        value = super().__getattr__(attr)
-        if value is not None:
-            return value.text[0]
-        return value
+        if attr == 'comment':
+            MP3CommentTag(self).value = value
+        else:
+            super().__setattr__(attr, value)
 
     def __format_tag__(self, tag, value):
         """
@@ -86,6 +140,16 @@ class TagParser(BaseTagParser):
             return frame(encoding=Encoding.UTF8, text=value)
         except AttributeError as e:
             raise ValueError('Error importing ID3 frame {}: {}'.format(tag, e))
+
+    def items(self):
+        """
+        Return tag items
+        """
+        items = super().items()
+        comment = self.comment
+        if comment is not None:
+            items['comment'] = comment
+        return items
 
     def load(self, path):
         self.__path__ = path

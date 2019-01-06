@@ -8,7 +8,7 @@ TAG_FIELDS = {
     'description':          ['desc'],
     'disc_id':              ['disc'],
     'orchestra':            ['orch'],
-    'performers':           ['ense'],
+    'performer':            ['ense'],
     'album':                ['\xa9alb'],
     'title':                ['\xa9nam'],
     'genre':                ['\xa9gen'],

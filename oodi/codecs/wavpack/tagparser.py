@@ -63,3 +63,9 @@ class TagParser(BaseTagParser):
     fields = TAG_FIELDS
     list_fields = LIST_FIELDS
     internal_fields = INTERNAL_FIELDS
+
+    def __getattr__(self, attr):
+        value = super().__getattr__(attr)
+        if value is not None:
+            value = value.value
+        return value

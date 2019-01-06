@@ -23,6 +23,7 @@ TEST_BASIC_TAGS = {
     'album_artist': 'Testaaja, Teemu',
     'artist': 'Teemu Testaaja',
     'title': 'Tää on mun eka oma biisi',
+    'comment': 'Kekkonen kommentoi'
 }
 
 # Formats for which numbering tags (value/total) always require total count as well
@@ -96,6 +97,55 @@ class CodecTags(unittest.TestCase):
 
             track = Track(configuration, tag_file)
             for tag in TEST_BASIC_TAGS:
+                delattr(track.tags, tag)
+                self.assertIsNone(getattr(track.tags, tag))
+
+            track = Track(configuration, tag_file)
+            self.assertDictEqual(track.tags.items(), {})
+
+    def test_common_tag_writing(self):
+        """
+        Test writing all common tag fields with random values
+        """
+        from uuid import uuid4
+        from oodi.codecs.constants import COMMON_TEXT_TAGS
+        from oodi.configuration import Configuration
+        from oodi.library.track import Track
+
+        configuration = Configuration()
+
+        self.maxDiff = None
+
+        for name in TEST_FILES:
+            input_file = os.path.join(TEST_FILES_PATH, name)
+            tag_file = configuration.get_temporary_file_path(name)
+
+            shutil.copyfile(input_file, tag_file)
+            track = Track(configuration, tag_file)
+            self.assertTrue(track.supports_tags, 'Track {} is expected to support tags'.format(tag_file))
+
+            test_tags = {}
+            for tag in COMMON_TEXT_TAGS:
+                if tag in track.tags.fields:
+                    test_tags[tag] = str(uuid4())
+
+            for tag, value in test_tags.items():
+                setattr(track.tags, tag, value)
+                self.assertEqual(
+                    value,
+                    getattr(track.tags, tag),
+                    'Error testing {} tag {}'.format(tag_file, tag)
+                )
+
+            track = Track(configuration, tag_file)
+            self.assertDictEqual(
+                track.tags.items(),
+                test_tags,
+                'Error comparing {} tag dictionaries'.format(tag_file)
+            )
+
+            track = Track(configuration, tag_file)
+            for tag in test_tags:
                 delattr(track.tags, tag)
                 self.assertIsNone(getattr(track.tags, tag))
 
