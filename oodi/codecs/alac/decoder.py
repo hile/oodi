@@ -1,5 +1,5 @@
 
-from ...codecs import BaseDecoder
+from ...codecs.base import BaseDecoder
 
 
 class Decoder(BaseDecoder):

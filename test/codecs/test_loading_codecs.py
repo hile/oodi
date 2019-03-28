@@ -26,12 +26,12 @@ class CodecLoading(unittest.TestCase):
     Tests loading of codecs
     """
 
-    def test_codec_loaders(self):
+    def test_loaders_codecs(self):
         """
         Test loading codec objects (oodi.codecs.Codecs)
         """
         from oodi.configuration import Configuration
-        from oodi.codecs import Codecs, CodecError, GenericAudioFile, BaseDecoder, BaseEncoder, BaseTagParser
+        from oodi.codecs.base import Codecs, CodecError, GenericAudioFile, BaseDecoder, BaseEncoder, BaseTagParser
 
         codecs = Codecs(Configuration())
 

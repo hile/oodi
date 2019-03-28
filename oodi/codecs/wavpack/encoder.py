@@ -1,5 +1,5 @@
 
-from ...codecs import BaseEncoder, CommandArgumentParser
+from ...codecs.base import BaseEncoder, CommandArgumentParser
 
 
 class WavpackConvertArguments(CommandArgumentParser):

@@ -1,8 +1,10 @@
 
-from systematic.shell import Script, ScriptCommand
+from systematic.shell import Script
 
-from oodi.configuration import Configuration, ConfigurationError, DEFAULT_CONFIG_PATH
+from oodi.configuration import Configuration, ConfigurationError
+from oodi.constants import DEFAULT_CONFIG_PATH
 
+from .commands.list_codecs import ListCodecs
 
 USAGE = """Oodi music library management tool
 
@@ -25,15 +27,11 @@ class OodiScript(Script):
         return super().__process_args__(args)
 
 
-class Command(ScriptCommand):
-    """
-    Commands for Oodi
-    """
-    pass
-
-
 def main():
     script = OodiScript(USAGE)
+
+    script.add_subcommand(ListCodecs())
+
     script.parse_args()
 
 

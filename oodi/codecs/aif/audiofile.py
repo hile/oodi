@@ -1,5 +1,5 @@
 
-from ...codecs import GenericAudioFile
+from ...codecs.base import GenericAudioFile
 
 from .decoder import Decoder
 from .encoder import Encoder
@@ -8,18 +8,21 @@ from .tagparser import TagParser
 
 class Audiofile(GenericAudioFile):
     """
-    ALAC audio file
+    AIF audio file
     """
 
     decoder_class = Decoder
     encoder_class = Encoder
     tagparser_class = TagParser
 
-    format = 'alac'
-    description = ' Apple Lossless Audio Codec'
+    format = 'aif'
+    description = 'Audio Interchange File Format'
     extensions = (
-        'm4a',
-        'alac',
+        'aif',
+        'aiff',
+        'aifc',
     )
     mimetypes = (
+        'audio/x-aiff',
+        'audio/aiff',
     )

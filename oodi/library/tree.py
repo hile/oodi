@@ -1,10 +1,10 @@
 
 import os
 
-from ..codecs import Codecs
-from ..metadata import Metadata
+from ..codecs.base import Codecs
+from ..metadata.base import Metadata
 
-from . import Directory
+from .base import Directory
 from .exceptions import LibraryError
 from .track import Track
 from .metadata import MetadataFile

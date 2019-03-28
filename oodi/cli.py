@@ -1,17 +1,9 @@
 
-__version__ = '0.1'
-
-import os
-import sys
 import time
 
 from subprocess import Popen, PIPE
 from systematic.shell import ShellCommandParser, CommandPathCache, ScriptError
 
-if sys.platform == 'darwin':
-    CONFIG_PATH = os.path.expanduser('~/Library/Application Support/Oodi')
-else:
-    CONFIG_PATH = os.path.expanduser('~/.config/Oodi')
 
 __command_lookup__ = CommandPathCache()
 

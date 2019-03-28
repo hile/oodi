@@ -18,8 +18,8 @@ class CodecConfiguration(ConfigurationSection):
     @property
     def codecs(self):
         if not self.__codecs__:
-            from . import Codecs
-            self.__codecs__ = Codecs(self.configuration).codecs
+            from .base import Codecs
+            self.__codecs__ = Codecs(self.configuration)
         return self.__codecs__
 
     def find_codecs_for_extension(self, extension):

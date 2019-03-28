@@ -1,6 +1,6 @@
 
 from setuptools import setup, find_packages
-from oodi import __version__
+from oodi.version import __version__
 
 setup(
     name='oodi',

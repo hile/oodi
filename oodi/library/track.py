@@ -2,7 +2,7 @@
 import os
 import re
 
-from . import File
+from .base import File
 from .exceptions import LibraryError
 
 # Regexp patterns to match track filenames

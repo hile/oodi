@@ -17,7 +17,7 @@ class LibraryConfiguration(ConfigurationSection):
     @property
     def libraries(self):
         if not self.__libraries__:
-            from . import Libraries
+            from .base import Libraries
             self.__libraries__ = Libraries(self.configuration)
         return self.__libraries__
 

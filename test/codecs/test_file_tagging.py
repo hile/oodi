@@ -35,7 +35,7 @@ class CodecTags(unittest.TestCase):
     Tests tagging for various codecs
     """
 
-    def test_empty_testfile_tags(self):
+    def test_tagging_empty_testfile_tags(self):
         """
         Test reading tags from included tests files.
 
@@ -43,7 +43,7 @@ class CodecTags(unittest.TestCase):
 
         Also checks files that do not support tagging.
         """
-        from oodi.codecs import BaseTagParser
+        from oodi.codecs.base import BaseTagParser
         from oodi.configuration import Configuration
         from oodi.library.track import Track
 
@@ -72,7 +72,7 @@ class CodecTags(unittest.TestCase):
             self.assertIsInstance(track.tags.items(), dict, 'Track {} tags.items() is not dict'.format(testfile))
             self.assertEqual(track.tags.items(), {}, 'Track {} contains tag data'.format(testfile))
 
-    def test_basic_tag_writing(self):
+    def test_tagging_basic_tag_writing(self):
         """
         Test adding basic tags to supported files
         """
@@ -103,7 +103,7 @@ class CodecTags(unittest.TestCase):
             track = Track(configuration, tag_file)
             self.assertDictEqual(track.tags.items(), {})
 
-    def test_common_tag_writing(self):
+    def test_tagging_common_tag_writing(self):
         """
         Test writing all common tag fields with random values
         """
@@ -152,7 +152,7 @@ class CodecTags(unittest.TestCase):
             track = Track(configuration, tag_file)
             self.assertDictEqual(track.tags.items(), {})
 
-    def test_track_numbering_writing(self):
+    def test_tagging_track_numbering_writing(self):
         """
         Test writing track numbering tags
         """

@@ -4,7 +4,7 @@ import os
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
-from ...codecs import BaseTagParser, ValueTotalCountTag
+from ...codecs.base import BaseTagParser, ValueTotalCountTag
 from .constants import TAG_FIELDS
 
 

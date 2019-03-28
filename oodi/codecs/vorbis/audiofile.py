@@ -1,5 +1,5 @@
 
-from ...codecs import GenericAudioFile
+from ...codecs.base import GenericAudioFile
 
 from .decoder import Decoder
 from .encoder import Encoder
@@ -8,20 +8,22 @@ from .tagparser import TagParser
 
 class Audiofile(GenericAudioFile):
     """
-    MP3 audio file
+    Ogg Vorbis audio file
     """
 
     decoder_class = Decoder
     encoder_class = Encoder
     tagparser_class = TagParser
 
-    format = 'mp3'
-    description = 'MPEG-2 Audio Layer III'
+    format = 'vorbis'
+    description = 'Ogg Vorbis'
     extensions = (
-        'mp3',
+        'ogg',
+        'vorbis',
     )
     mimetypes = (
-        'audio/mpeg',
-        'audio/MPA',
-        'audio/mpa-robust',
+        'application/ogg',
+        'audio/ogg',
+        'audio/vorbis',
+        'audio/vorbis-config'
     )

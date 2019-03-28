@@ -1,5 +1,5 @@
 
-from . import File
+from .base import File
 
 
 class MetadataFile(File):

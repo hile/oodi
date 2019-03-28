@@ -3,7 +3,7 @@ import os
 
 from mutagen.aiff import AIFF
 
-from ...codecs import BaseTagParser, ValueTotalCountTag
+from ...codecs.base import BaseTagParser, ValueTotalCountTag
 from .constants import TAG_FIELDS
 
 

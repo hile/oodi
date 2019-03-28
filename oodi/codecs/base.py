@@ -1,7 +1,7 @@
 
 import os
 
-from .. import OodiShellCommandParser
+from ..cli import OodiShellCommandParser
 
 
 class CodecError(Exception):
@@ -404,25 +404,25 @@ class GenericAudioFile(AudiofileProcessorBaseClass):
             raise CodecError('Codec {} does not support testing'.format(self.format))
 
 
-class Codecs:
+class Codecs(list):
     """
     Supported codec implementations
     """
 
     def __init__(self, configuration):
-        from .aac import Audiofile as AAC
-        from .aif import Audiofile as AIF
-        from .alac import Audiofile as ALAC
-        from .caf import Audiofile as CAF
-        from .flac import Audiofile as FLAC
-        from .mp3 import Audiofile as MP3
-        from .opus import Audiofile as OPUS
-        from .vorbis import Audiofile as VORBIS
-        from .wav import Audiofile as WAV
-        from .wavpack import Audiofile as WAVPACK
+        from .aac.audiofile import Audiofile as AAC
+        from .aif.audiofile import Audiofile as AIF
+        from .alac.audiofile import Audiofile as ALAC
+        from .caf.audiofile import Audiofile as CAF
+        from .flac.audiofile import Audiofile as FLAC
+        from .mp3.audiofile import Audiofile as MP3
+        from .opus.audiofile import Audiofile as OPUS
+        from .vorbis.audiofile import Audiofile as VORBIS
+        from .wav.audiofile import Audiofile as WAV
+        from .wavpack.audiofile import Audiofile as WAVPACK
 
         self.configuration = configuration
-        self.codecs = (
+        self.extend([
             AAC(self.configuration),
             AIF(self.configuration),
             ALAC(self.configuration),
@@ -433,13 +433,13 @@ class Codecs:
             VORBIS(self.configuration),
             WAV(self.configuration),
             WAVPACK(self.configuration),
-        )
+        ])
 
     def __getattr__(self, name):
         """
         Get codec by name of format
         """
-        for codec in self.codecs:
+        for codec in self:
             if codec.format == name:
                 return codec
         raise AttributeError('No such codec: {}'.format(name))
@@ -450,4 +450,4 @@ class Codecs:
 
         May return multiple (.m4a for AAC and ALAC, for example)
         """
-        return [codec for codec in self.codecs if extension in codec.extensions]
+        return [codec for codec in self if extension in codec.extensions]

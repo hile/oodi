@@ -1,5 +1,5 @@
 
-from .. import OodiShellCommandParser
+from ..cli import OodiShellCommandParser
 
 
 class AlbumArt(OodiShellCommandParser):

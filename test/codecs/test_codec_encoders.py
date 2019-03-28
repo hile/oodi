@@ -26,7 +26,7 @@ class CodecEncoders(unittest.TestCase):
         self.configuration = Configuration()
         self.input_file = os.path.join(os.path.dirname(__file__), 'files/test.wav')
 
-    def test_aac_encoder(self):
+    def test_encoder_aac(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.exceptions import LibraryError
         from oodi.library.track import Track
@@ -45,7 +45,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'aac')
 
-    def test_aif_encoder(self):
+    def test_encoder_aif(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 
@@ -57,7 +57,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'aif')
 
-    def test_alac_encoder(self):
+    def test_encoder_alac(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.exceptions import LibraryError
         from oodi.library.track import Track
@@ -76,7 +76,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'alac')
 
-    def test_caf_encoder(self):
+    def test_encoder_caf(self):
         from oodi.library.track import Track
 
         filename = self.configuration.get_temporary_file_path('test.caf')
@@ -86,7 +86,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
 
-    def test_flac_encoder(self):
+    def test_encoder_flac(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 
@@ -98,7 +98,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'flac')
 
-    def test_mp3_encoder(self):
+    def test_encoder_mp3(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 
@@ -110,7 +110,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'mp3')
 
-    def test_opus_encoder(self):
+    def test_encoder_opus(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 
@@ -122,7 +122,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'opus')
 
-    def test_vorbis_encoder(self):
+    def test_encoder_vorbis(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 
@@ -134,7 +134,7 @@ class CodecEncoders(unittest.TestCase):
         self.assertTrue(os.path.isfile(output_file))
         self.assertEqual(detect_file_codec(filename), 'vorbis')
 
-    def test_wavpack_encoder(self):
+    def test_encoder_wavpack(self):
         from oodi.codecs.utils import detect_file_codec
         from oodi.library.track import Track
 

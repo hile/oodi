@@ -18,13 +18,13 @@ class LibraryConfigurationTests(unittest.TestCase):
     Tests loading of oodi configuration
     """
 
-    def test_default_configuration(self):
+    def test_library_configuration_default_configuration(self):
         """
         Test default library configuration
         """
 
         from oodi.configuration import Configuration
-        from oodi.library import Libraries
+        from oodi.library.base import Libraries
 
         config = Configuration()
         self.assertIsInstance(config.library['trees'], list)
@@ -32,7 +32,7 @@ class LibraryConfigurationTests(unittest.TestCase):
         libraries = Libraries(config)
         self.assertIsInstance(libraries.trees, list)
 
-    def test_temporary_directory_cleanup(self):
+    def test_library_configuration_temporary_directory_cleanup(self):
         """
         Make sure temporary directory is cleared after configuration is
         deleted after garbage collection
@@ -51,14 +51,14 @@ class LibraryConfigurationTests(unittest.TestCase):
         gc.collect()
         self.assertFalse(os.path.isdir(tmp_dir))
 
-    def test_invalid_configured_formats(self):
+    def test_library_configuration_invalid_configured_formats(self):
         """
         Test configuration where tree has invalid codec name in formats
 
         Must raise LibraryError when attepting to validate files in tree
         """
         from oodi.configuration import Configuration
-        from oodi.library import Libraries
+        from oodi.library.base import Libraries
         from oodi.library.exceptions import LibraryError
         from oodi.library.tree import Tree
 
@@ -84,13 +84,13 @@ class LibraryConfigurationTests(unittest.TestCase):
         with self.assertRaises(LibraryError):
             tree.__validate_extension__('test.m4a')
 
-    def test_custom_tree_path(self):
+    def test_library_configuration_custom_tree_path(self):
         """
         Test configuration that has custom tree with path
         """
 
         from oodi.configuration import Configuration
-        from oodi.library import Libraries
+        from oodi.library.base import Libraries
         from oodi.library.tree import Tree
 
         if os.path.isdir(NEW_LIBRARY_PATH):
@@ -118,12 +118,12 @@ class LibraryConfigurationTests(unittest.TestCase):
         self.assertTrue(tree.exists)
         shutil.rmtree(NEW_LIBRARY_PATH)
 
-    def test_custom_tree_prefixes(self):
+    def test_library_configuration_custom_tree_prefixes(self):
         """
         Test library configuration with tree prefixes
         """
         from oodi.configuration import Configuration
-        from oodi.library import Libraries
+        from oodi.library.base import Libraries
         from oodi.library.tree import Tree
 
         for path in TEST_PREFIX_PATHS:

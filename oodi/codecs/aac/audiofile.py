@@ -1,5 +1,5 @@
 
-from ...codecs import GenericAudioFile
+from ...codecs.base import GenericAudioFile
 
 from .decoder import Decoder
 from .encoder import Encoder

@@ -30,7 +30,7 @@ class ConfigurationTests(unittest.TestCase):
             self.assertTrue(section in config.codecs, 'Missing codec configuration section {}'.format(section))
             section = config.codecs[section]
 
-    def test_default_configuration(self):
+    def test_configuration_default_configuration(self):
         """
         Test loading configuration with no options
         """
@@ -38,7 +38,7 @@ class ConfigurationTests(unittest.TestCase):
         config = Configuration()
         self.check_configuration_objects(config)
 
-    def test_no_path(self):
+    def test_configuration_no_path(self):
         """
         Test configuration can be loaded by passing None as path
         """
@@ -46,7 +46,7 @@ class ConfigurationTests(unittest.TestCase):
         config = Configuration(path=None)
         self.check_configuration_objects(config)
 
-    def test_load_empty_configuration(self):
+    def test_configuration_load_empty_configuration(self):
         """
         Test loading empty yaml configuration
         """
@@ -54,7 +54,7 @@ class ConfigurationTests(unittest.TestCase):
         config = Configuration(os.path.join(TEST_FILES_PATH, 'empty.yaml'))
         self.check_configuration_objects(config)
 
-    def test_load_invalid_configuration(self):
+    def test_configuration_load_invalid_configuration(self):
         """
         Test loading invalid yaml configuration.
 
@@ -64,7 +64,7 @@ class ConfigurationTests(unittest.TestCase):
         with self.assertRaises(ConfigurationError):
             Configuration(os.path.join(TEST_FILES_PATH, 'invalid.yaml'))
 
-    def test_load_custom_codec_configuration(self):
+    def test_configuration_load_custom_codec_configuration(self):
         """
         Test loading custom settings to codecs configuration
 
@@ -78,7 +78,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(config.codecs.get('aac').get('bitrate'), 123456)
         self.assertEqual(config.codecs.get('encoders').get('wav'), [])
 
-    def test_load_directory_path(self):
+    def test_configuration_load_directory_path(self):
         """
         Test loading directory path as yaml configuration
         """
@@ -86,7 +86,7 @@ class ConfigurationTests(unittest.TestCase):
         with self.assertRaises(ConfigurationError):
             Configuration(path='/')
 
-    def test_invalid_file_path(self):
+    def test_configuration_invalid_file_path(self):
         """
         Test loading invalid path as yaml configuration
         """

@@ -4,10 +4,6 @@ import tempfile
 
 import ruamel.yaml
 
-from . import CONFIG_PATH
-
-DEFAULT_CONFIG_PATH = os.path.join(CONFIG_PATH, 'config.yaml')
-
 CONFIG_FIELDS = (
     'tmpdir',
 )
@@ -57,7 +53,7 @@ class Configuration:
     Configuration file parser
     """
 
-    def __init__(self, path=DEFAULT_CONFIG_PATH):
+    def __init__(self, path=None):
         """
         Load base configuration for oodi with codecs and libraries
 
@@ -77,7 +73,7 @@ class Configuration:
             setattr(self, field, None)
         self.load(os.path.join(os.path.dirname(__file__), 'defaults.yaml'))
 
-        if self.path:
+        if self.path is not None:
             self.load(self.path)
 
     def __del__(self):
@@ -105,16 +101,22 @@ class Configuration:
         Also configures self.codecs and self.libraries child classes
         """
 
+        if path is None:
+            return
+
         data = {}
-        if os.path.isfile(os.path.realpath(path)):
+        config_realpath = os.path.realpath(os.path.expanduser(os.path.expanduser(path)))
+        if os.path.isfile(config_realpath):
             try:
                 with open(path, 'r') as fd:
                     yaml = ruamel.yaml.YAML()
                     data = yaml.load(fd)
             except Exception as e:
                 raise ConfigurationError('Error loading configuration file {}: {}'.format(path, e))
+        elif os.path.exists(config_realpath):
+            raise ConfigurationError('Configuration file exists but is not a file: {}'.format(path))
         else:
-            raise ConfigurationError('Configuration is not a file: {}'.format(path))
+            raise ConfigurationError('Invalid configuration file path: {}'.format(path))
 
         if isinstance(data, dict):
             for field in CONFIG_FIELDS:

@@ -2,7 +2,7 @@
 from mutagen.mp4 import MP4
 # These will be needed for coverart handling MP4Cover, MP4StreamInfoError, MP4MetadataValueError
 
-from oodi.codecs import BaseTagParser, ValueTotalCountTag
+from oodi.codecs.base import BaseTagParser, ValueTotalCountTag
 from oodi.codecs.mp4.constants import TAG_FIELDS, INTERNAL_FIELDS
 
 

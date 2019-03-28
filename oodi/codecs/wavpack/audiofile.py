@@ -1,5 +1,5 @@
 
-from ...codecs import GenericAudioFile
+from ...codecs.base import GenericAudioFile
 
 from .decoder import Decoder
 from .encoder import Encoder
@@ -8,18 +8,18 @@ from .tagparser import TagParser
 
 class Audiofile(GenericAudioFile):
     """
-    FLAC audio file
+    Wavpack audio file
     """
 
     decoder_class = Decoder
     encoder_class = Encoder
     tagparser_class = TagParser
 
-    format = 'flac'
-    description = 'Free Lossless Audio Codec'
+    format = 'wavpack'
+    description = 'Wavpack files'
     extensions = (
-        'flac',
+        'wv',
+        'wavpack',
     )
     mimetypes = (
-        'audio/flac',
     )

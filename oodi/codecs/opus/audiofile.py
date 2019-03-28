@@ -1,5 +1,5 @@
 
-from ...codecs import GenericAudioFile
+from ...codecs.base import GenericAudioFile
 
 from .decoder import Decoder
 from .encoder import Encoder
@@ -8,22 +8,19 @@ from .tagparser import TagParser
 
 class Audiofile(GenericAudioFile):
     """
-    Ogg Vorbis audio file
+    Opus audio file
     """
 
     decoder_class = Decoder
     encoder_class = Encoder
     tagparser_class = TagParser
 
-    format = 'vorbis'
-    description = 'Ogg Vorbis'
+    format = 'opus'
+    description = 'Opus (RFC 6716)'
     extensions = (
-        'ogg',
-        'vorbis',
+        'opus',
     )
     mimetypes = (
-        'application/ogg',
+        'audio/opus',
         'audio/ogg',
-        'audio/vorbis',
-        'audio/vorbis-config'
     )
