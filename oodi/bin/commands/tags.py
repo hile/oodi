@@ -46,7 +46,7 @@ class Tags(Command):
             try:
                 tag, value = arg.split('=', 1)
                 updated_tags[tag] = value
-            except Exception as e:
+            except Exception:
                 self.exit(1, 'Error parsing tag {}'.format(arg))
 
         for iterator in self.get_path_iterators(args.paths):

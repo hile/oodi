@@ -53,4 +53,3 @@ class MP4TagParser(BaseTagParser):
             value = [int(value)]
 
         return value
-
