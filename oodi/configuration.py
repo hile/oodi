@@ -116,7 +116,7 @@ class Configuration:
         elif os.path.exists(config_realpath):
             raise ConfigurationError('Configuration file exists but is not a file: {}'.format(path))
         else:
-            raise ConfigurationError('Invalid configuration file path: {}'.format(path))
+            raise ConfigurationError('Missing configuration file: {}'.format(path))
 
         if isinstance(data, dict):
             for field in CONFIG_FIELDS:

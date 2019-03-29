@@ -230,7 +230,7 @@ class Directory(FilesystemItem):
 
     def load(self):
         """
-        Load all items in the tree instaed of iterating
+        Load all items in the tree instead of iterating
         """
         self.reset()
 
@@ -248,6 +248,23 @@ class File(FilesystemItem):
     pass
 
 
+class IterableFilesystemPath:
+    """
+    Loader for directories and files as paths, returning always iterable that
+    iterates File objects
+    """
+    def __init__(self, configuration, path):
+        if os.path.isfile(path):
+            self.item = iter([File(configuration, path)])
+        elif os.path.isdir(path):
+            self.item = Directory(configuration, path)
+        else:
+            raise LibraryError('Invalid path: {}'.format(path))
+
+    def __iter__(self):
+        return self.item
+
+
 class Libraries:
     """
     Loader for configured libraries
@@ -257,6 +274,9 @@ class Libraries:
         self.configuration = configuration
         self.trees = []
         self.__initialize_trees__()
+
+        self.__iter_index__ = None
+        self.__iter_keys__ = []
 
     def __initialize_trees__(self):
         """
@@ -280,6 +300,20 @@ class Libraries:
                     formats=item.get('formats', None),
                     description=item.get('description', None),
                 )
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.__iter_index__ is None:
+            self.__iter_index__ = 0
+            self.__iter_keys__ = self.trees
+        try:
+            tree = self.trees[self.__iter_index__]
+            self.__iter_index__ += 1
+            return tree
+        except IndexError:
+            raise StopIteration
 
     def add_tree(self, path, description=None, formats=list):
         """
@@ -321,7 +355,7 @@ class Libraries:
         path = os.path.realpath(os.path.expandvars(os.path.expanduser(path)))
         for tree in self.trees:
             prefix = '{}/'.format(tree.path)
-            if path[:len(prefix)] == prefix:
+            if tree.path == path or path[:len(prefix)] == prefix:
                 return tree
 
     def find_trees_by_codec(self, name):

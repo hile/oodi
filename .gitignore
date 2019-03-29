@@ -1,6 +1,7 @@
 /build/
 /dist/
 /doc/
+/venv/
 /test/data/*
 .DS_Store
 /.idea/

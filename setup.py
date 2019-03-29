@@ -19,6 +19,7 @@ setup(
         ],
     },
     install_requires=(
+        'filemagic',
         'mutagen',
         'ruamel.yaml',
         'systematic',

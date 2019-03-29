@@ -1,4 +1,5 @@
 
+import magic
 import os
 
 from ..cli import OodiShellCommandParser
@@ -241,19 +242,6 @@ class BaseTagParser(AudiofileProcessorBaseClass):
                 return value
         return None
 
-    def __update_numbering_tag__(self, tag, value):
-        """
-        Update value / total disk numbering tags
-        """
-        if tag == 'track_number':
-            self.track_numbering.set('value', value)
-        elif tag == 'total_tracks':
-            self.track_numbering.set('total', value)
-        elif tag == 'disk_number':
-            self.disk_numbering.set('value', value)
-        elif tag == 'total_disks':
-            self.disk_numbering.set('total', value)
-
     def __setattr__(self, attr, value):
         """
         Set tag value
@@ -275,6 +263,19 @@ class BaseTagParser(AudiofileProcessorBaseClass):
             tag = self.fields[attr][0]
             del(self.__entry__[tag])
             self.__entry__.save()
+
+    def __update_numbering_tag__(self, tag, value):
+        """
+        Update value / total disk numbering tags
+        """
+        if tag == 'track_number':
+            self.track_numbering.set('value', value)
+        elif tag == 'total_tracks':
+            self.track_numbering.set('total', value)
+        elif tag == 'disk_number':
+            self.disk_numbering.set('value', value)
+        elif tag == 'total_disks':
+            self.disk_numbering.set('total', value)
 
     def __format_tag__(self, tag, value):
         """
@@ -324,9 +325,30 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         else:
             return {}
 
+    def magic(self, path):
+        """
+        Return file magic string
+        """
+        with magic.Magic() as m:
+            return m.id_filename(path)
+
     def load(self, path):
         self.__path__ = path
         self.__entry__ = self.loader(os.path.expandvars(os.path.expanduser(path)))
+
+    def update(self, **kwargs):
+        """
+        Update tags from kwargs
+
+        TODO - now we set tags one by one and save,
+        """
+
+        if 'track_number' in kwargs and 'total_tracks' in kwargs:
+            kwargs['track_number'] = '{}/{}'.format(kwargs['track_number'], kwargs['total_tracks'])
+            del kwargs['total_tracks']
+
+        for tag, value in kwargs.items():
+            setattr(self, tag, value)
 
     def items(self, internal_fields=False):
         """
@@ -451,3 +473,29 @@ class Codecs(list):
         May return multiple (.m4a for AAC and ALAC, for example)
         """
         return [codec for codec in self if extension in codec.extensions]
+
+    def find_codec_for_filename(self, path):
+        """
+        Find codec matching filename
+        """
+        name, extension = os.path.splitext(os.path.basename(path))
+        extension = extension.lstrip('.')
+        for codec in self:
+            if extension not in codec.extensions:
+                continue
+            return codec
+        return None
+
+    def get_tags_for_filename(self, path):
+        """
+
+        """
+        codec = self.find_codec_for_filename(path)
+        if codec:
+            tags = codec.tagparser
+            path = os.path.realpath(os.path.expandvars(os.path.expanduser(path)))
+            if os.path.isfile(path):
+                tags.load(path)
+            return tags
+
+        return None

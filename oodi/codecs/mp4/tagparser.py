@@ -43,3 +43,14 @@ class MP4TagParser(BaseTagParser):
     disk_numbering_class = MP4ValueTotalTag
     track_numbering_tag = 'trkn'
     disk_numbering_tag = 'disk'
+
+    def __format_tag__(self, tag, value):
+        """
+        Format tag to internal tag presentation
+        """
+        if tag == 'bpm':
+            # Format BPM to int list. Strange, yeah
+            value = [int(value)]
+
+        return value
+

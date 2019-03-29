@@ -4,7 +4,9 @@ from systematic.shell import Script
 from oodi.configuration import Configuration, ConfigurationError
 from oodi.constants import DEFAULT_CONFIG_PATH
 
-from .commands.list_codecs import ListCodecs
+from .commands.codecs import Codecs
+from .commands.libraries import Libraries
+from .commands.tags import Tags
 
 USAGE = """Oodi music library management tool
 
@@ -15,6 +17,7 @@ class OodiScript(Script):
     """
     Custom script for oodi
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.add_argument('-c', '--config', default=DEFAULT_CONFIG_PATH, help='Configuration file')
@@ -30,9 +33,11 @@ class OodiScript(Script):
 def main():
     script = OodiScript(USAGE)
 
-    script.add_subcommand(ListCodecs())
+    script.add_subcommand(Codecs())
+    script.add_subcommand(Libraries())
+    script.add_subcommand(Tags())
 
-    script.parse_args()
+    script.run()
 
 
 if __name__ == '__main__':
