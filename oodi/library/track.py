@@ -12,6 +12,9 @@ TRACKNAME_PATTERNS = (
     r'(?P<name>.*)\.(?P<extension>[\w\d]+)$',
 )
 
+ITUNES_BROKEN_AAC_MAGIC = 'ISO Media, MP4 v2 [ISO 14496-14]'
+ITUNES_EXPECTED_AAC_MAGIC = 'ISO Media, Apple iTunes ALAC/AAC-LC (.M4A) Audio'
+
 
 class Track(File):
     """
@@ -191,3 +194,56 @@ class Track(File):
             return tester.test(self.path, *args, **kwargs)
         else:
             raise LibraryError('Codec has no format tester')
+
+    def requires_aac_itunes_fix(self):
+        return self.magic == ITUNES_BROKEN_AAC_MAGIC
+
+    def fix_aac_for_itunes(self):
+        """
+        Fix old AAC files for itunes
+
+        Old files no more playing have magic 'ISO Media, MP4 v2 [ISO 14496-14]'
+        """
+        from shutil import copyfile
+        from subprocess import check_output
+
+        magic = self.magic
+        # Already correct magic
+        if magic == ITUNES_EXPECTED_AAC_MAGIC:
+            return
+
+        # Check this is actually of broken type
+        if magic != ITUNES_BROKEN_AAC_MAGIC:
+            print('{} unexpected magic string: {}'.format(self.path, magic))
+            return
+
+        # Get tag items to process to be added back to corrected file
+        tags = self.tags.items()
+
+        # Get album art
+        albumart = self.tags.get_albumart()
+
+        # Copy file to /tmp for processing
+        copyfile(self.path, '/tmp/broken.m4a')
+
+        # Use afconvert to create new file. This will have correct container type
+        check_output((
+            'afconvert',
+            '-b', '256000',
+            '-f', 'm4af',
+            '-d', 'aac',
+            '--soundcheck-generate',
+            '/tmp/broken.m4a',
+            '/tmp/fixed.m4a'
+        ))
+
+        # Add existing tags back to fixed file
+        self.tags.load('/tmp/fixed.m4a')
+        self.tags.update(**tags)
+
+        # Embed album art
+        if albumart is not None:
+            self.tags.set_albumart(albumart)
+
+        # Copy fixed file back in place
+        copyfile('/tmp/fixed.m4a', self.path)

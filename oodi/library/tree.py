@@ -20,18 +20,30 @@ class Tree(Directory):
     of files from tree to files with matching extensions only.
     """
 
-    def __init__(self, configuration, path, iterable, formats=list, description=None):
+    def __init__(self, configuration, path, iterable='files', formats=None, description=None):
         super().__init__(configuration, path, iterable)
 
         if isinstance(formats, str):
             formats = formats.split()
 
-        self.formats = formats
+        self.formats = formats if formats is not None else []
         self.description = description
         self.codecs = Codecs(self.configuration)
         self.metadata = Metadata(self.configuration)
         self.metadata_files = []
         self.__extensions__ = None
+
+    @property
+    def codec(self):
+        """
+        Return codec used for library
+
+        Raises ValueError if multiple codes match
+        """
+        if len(self.formats) == 1:
+            return getattr(self.codecs, self.formats[0])
+        else:
+            raise LibraryError('Multiple codecs configured for tree {}'.format(self.path))
 
     def __load_valid_extensions__(self):
         """
@@ -64,18 +76,6 @@ class Tree(Directory):
         name, extension = os.path.splitext(filename)
         extension = extension.lstrip('.')
         return extension in self.__extensions__
-
-    @property
-    def codec(self):
-        """
-        Return codec used for library
-
-        Raises ValueError if multiple codes match
-        """
-        if len(self.formats) == 1:
-            return getattr(self.codecs, self.formats[0])
-        else:
-            raise LibraryError('Multiple codecs configured for tree {}'.format(self.path))
 
     def add_directory(self, root, directory):
         """
@@ -114,3 +114,20 @@ class Tree(Directory):
             if root in self.__directory_index__:
                 item.parent = self.__directory_index__[root]
             self.metadata_files.append(item)
+
+
+class IterableTrackPaths:
+    """
+    Loader for directories and files as paths, returning always iterable that
+    iterates Track objects
+    """
+    def __init__(self, configuration, path):
+        if os.path.isfile(path):
+            self.item = iter([Track(configuration, path)])
+        elif os.path.isdir(path):
+            self.item = Tree(configuration, path)
+        else:
+            raise LibraryError('Invalid path: {}'.format(path))
+
+    def __iter__(self):
+        return self.item

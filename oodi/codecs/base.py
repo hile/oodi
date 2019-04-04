@@ -1,5 +1,4 @@
 
-import magic
 import os
 
 from ..cli import OodiShellCommandParser
@@ -8,6 +7,13 @@ from ..cli import OodiShellCommandParser
 class CodecError(Exception):
     """
     Exceptions from codecs and codec commands
+    """
+    pass
+
+
+class TagError(Exception):
+    """
+    Exceptions from tagging commmands
     """
     pass
 
@@ -216,6 +222,10 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         self.track_numbering = self.track_numbering_class(self, self.track_numbering_tag)
         self.disk_numbering = self.disk_numbering_class(self, self.disk_numbering_tag)
 
+        self.__iterator_index__ = None
+        self.__iterator_keys__ = []
+        self.__iterator_items__ = {}
+
     def __repr__(self):
         if self.__path__ is not None:
             return '{} {}'.format(self.format, self.__path__)
@@ -264,6 +274,24 @@ class BaseTagParser(AudiofileProcessorBaseClass):
             del(self.__entry__[tag])
             self.__entry__.save()
 
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.__iterator_index__ is None:
+            self.__iterator_index__ = 0
+            self.__iterator_items__ = self.items()
+            self.__iterator_keys__ = sorted(key for key in self.__iterator_items__)
+
+        try:
+            tag = self.__iterator_keys__[self.__iterator_index__]
+            value = self.__iterator_items__[self.__iterator_keys__[self.__iterator_index__]]
+            self.__iterator_index__ += 1
+            return (tag, value)
+        except IndexError:
+            self.__iterator_index__ = None
+            raise StopIteration
+
     def __update_numbering_tag__(self, tag, value):
         """
         Update value / total disk numbering tags
@@ -282,6 +310,13 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         Format tag to internal tag presentation
         """
         return value
+
+    @property
+    def file_loaded(self):
+        """
+        Return true if tags have been loaded with a file
+        """
+        return self.__path__ is not None
 
     @property
     def track_number(self):
@@ -325,14 +360,10 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         else:
             return {}
 
-    def magic(self, path):
-        """
-        Return file magic string
-        """
-        with magic.Magic() as m:
-            return m.id_filename(path)
-
     def load(self, path):
+        """
+        Load tags for audio file
+        """
         self.__path__ = path
         self.__entry__ = self.loader(os.path.expandvars(os.path.expanduser(path)))
 
@@ -340,7 +371,7 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         """
         Update tags from kwargs
 
-        TODO - now we set tags one by one and save,
+        TODO - now we set tags one by one and save, do it more efficiently
         """
 
         if 'track_number' in kwargs and 'total_tracks' in kwargs:
@@ -369,6 +400,18 @@ class BaseTagParser(AudiofileProcessorBaseClass):
                 items[attr] = value
 
         return items
+
+    def get_albumart(self):
+        """
+        Return album art from tags
+        """
+        raise NotImplementedError('get_albumart must be defined in child class')
+
+    def set_albumart(self, albumart):
+        """
+        Embed albumart to audio file
+        """
+        raise NotImplementedError('set_albumart must be defined in child class')
 
 
 class GenericAudioFile(AudiofileProcessorBaseClass):

@@ -1,4 +1,5 @@
 
+import magic
 import os
 
 from .exceptions import LibraryError
@@ -11,7 +12,9 @@ class FilesystemItem:
 
     def __init__(self, configuration, path):
         self.configuration = configuration
-        self.path = os.path.expandvars(os.path.expanduser(path))
+        if path is not None:
+            path = os.path.expandvars(os.path.expanduser(path))
+        self.path = path
 
     def __repr__(self):
         return self.path
@@ -247,22 +250,13 @@ class File(FilesystemItem):
     """
     pass
 
-
-class IterableFilesystemPath:
-    """
-    Loader for directories and files as paths, returning always iterable that
-    iterates File objects
-    """
-    def __init__(self, configuration, path):
-        if os.path.isfile(path):
-            self.item = iter([File(configuration, path)])
-        elif os.path.isdir(path):
-            self.item = Directory(configuration, path)
-        else:
-            raise LibraryError('Invalid path: {}'.format(path))
-
-    def __iter__(self):
-        return self.item
+    @property
+    def magic(self):
+        """
+        Return file magic string
+        """
+        with magic.Magic() as m:
+            return m.id_filename(self.path)
 
 
 class Libraries:

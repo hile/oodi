@@ -22,6 +22,7 @@ setup(
         'filemagic',
         'mutagen',
         'ruamel.yaml',
+        'pillow',
         'systematic',
     ),
     tests_require=(

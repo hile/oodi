@@ -25,6 +25,3 @@ class Codecs(Command):
 
     def show_codec_details(self, args):
         self.codecs
-
-    def run(self, args):
-        args.func(args)

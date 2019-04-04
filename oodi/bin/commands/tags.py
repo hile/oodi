@@ -1,5 +1,4 @@
 
-from oodi.library.base import IterableFilesystemPath, LibraryError
 from .base import Command
 
 
@@ -31,15 +30,6 @@ class Tags(Command):
         p.add_argument('paths', nargs='*', help='Paths to process')
         p.set_defaults(func=self.fix_itunes_containers)
 
-    def get_path_iterators(self, paths):
-        iterators = []
-        for path in paths:
-            try:
-                iterators.append(IterableFilesystemPath(self.script.configuration, path))
-            except LibraryError as e:
-                self.error(e)
-        return iterators
-
     def set_tags(self, args):
         updated_tags = {}
         for arg in args.tags:
@@ -49,37 +39,33 @@ class Tags(Command):
             except Exception:
                 self.exit(1, 'Error parsing tag {}'.format(arg))
 
-        for iterator in self.get_path_iterators(args.paths):
-            for item in iterator:
-                tags = self.codecs.get_tags_for_filename(item.path)
+        for arg in self.get_tracks(args.paths):
+            for track in arg:
+                tags = track.tags
                 if tags:
                     tags.update(**updated_tags)
 
     def list_tags(self, args):
-        for iterator in self.get_path_iterators(args.paths):
-            for item in iterator:
-                tags = self.codecs.get_tags_for_filename(item.path)
+        """
+        List file tags
+        """
+        for arg in self.get_tracks(args.paths):
+            for track in arg:
+                tags = track.tags
                 if tags:
-                    print(tags.items())
+                    for tag, value in tags:
+                        print('{:20} {}'.format(tag, value))
 
     def list_magic_strings(self, args):
-        for iterator in self.get_path_iterators(args.paths):
-            for item in iterator:
-                tags = self.codecs.get_tags_for_filename(item.path)
-                if tags:
-                    print('{}: {}'.format(item.path, tags.magic(item.path)))
+        for arg in self.get_tracks(args.paths):
+            for track in arg:
+                print('{}: {}'.format(track.path, track.magic))
 
     def fix_itunes_containers(self, args):
-        for iterator in self.get_path_iterators(args.paths):
-            for item in iterator:
-                path = item.path
-                tags = self.codecs.get_tags_for_filename(path)
-                if tags:
-                    if tags.requires_aac_itunes_fix(path):
-                        print('FIX  {}'.format(path))
-                        tags.fix_aac_for_itunes(path)
-                    else:
-                        print('OK   {}'.format(path))
-
-    def run(self, args):
-        args.func(args)
+        for arg in self.get_tracks(args.paths):
+            for track in arg:
+                if track.requires_aac_itunes_fix():
+                    print('FIX   {}'.format(track))
+                    track.fix_aac_for_itunes()
+                else:
+                    print('OK    {}'.format(track))

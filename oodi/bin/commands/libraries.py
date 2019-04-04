@@ -19,6 +19,3 @@ class Libraries(Command):
     def list_libraries(self, args):
         for library in self.libraries:
             print(library)
-
-    def run(self, args):
-        args.func(args)

@@ -1,9 +1,15 @@
 
-from mutagen.mp4 import MP4
-# These will be needed for coverart handling MP4Cover, MP4StreamInfoError, MP4MetadataValueError
+from mutagen.mp4 import MP4, MP4Cover, MP4MetadataValueError
 
-from oodi.codecs.base import BaseTagParser, ValueTotalCountTag
+from oodi.metadata.albumart import AlbumArt
+from oodi.codecs.base import BaseTagParser, ValueTotalCountTag, TagError
 from oodi.codecs.mp4.constants import TAG_FIELDS, INTERNAL_FIELDS
+
+ALBUMART_TAG = 'covr'
+ALBUMART_PIL_FORMAT_MAP = {
+    'JPEG':     MP4Cover.FORMAT_JPEG,
+    'PNG':      MP4Cover.FORMAT_PNG
+}
 
 
 class MP4ValueTotalTag(ValueTotalCountTag):
@@ -53,3 +59,46 @@ class MP4TagParser(BaseTagParser):
             value = [int(value)]
 
         return value
+
+    def get_albumart(self):
+        """
+        Get data from tag to Albumart object
+        """
+        if ALBUMART_TAG in self.__entry__:
+            return AlbumArt(
+                configuration=self.configuration, path=None
+            ).load_data(self.__entry__[ALBUMART_TAG][0])
+        else:
+            return None
+
+    def set_albumart(self, albumart):
+        """
+        Imports albumart object to the file tags.
+
+        Sets self.track.modified to True
+        """
+
+        file_format = albumart.file_format
+        if file_format is not None:
+            try:
+                img_format = ALBUMART_PIL_FORMAT_MAP[file_format]
+            except KeyError:
+                raise TagError('Unsupported albumart format {}'.format(file_format))
+        else:
+            raise TagError('Error getting file format for image {} ({})'.format(
+                albumart.mimetype, albumart.__image__.format
+            ))
+
+        try:
+            tag = MP4Cover(data=albumart.dump(), imageformat=img_format)
+        except MP4MetadataValueError as e:
+            raise TagError('Error encoding albumart to mp4 tags: {}'.format(e))
+
+        if ALBUMART_TAG in self.__entry__:
+            if self.__entry__[ALBUMART_TAG] == [tag]:
+                return False
+            else:
+                del self.__entry__[ALBUMART_TAG]
+
+        self.__entry__[ALBUMART_TAG] = [tag]
+        self.__entry__.save()
