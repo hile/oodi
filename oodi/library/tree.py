@@ -23,15 +23,27 @@ class Tree(Directory):
     def __init__(self, configuration, path, iterable='files', formats=None, description=None):
         super().__init__(configuration, path, iterable)
 
-        if isinstance(formats, str):
-            formats = formats.split()
-
         self.formats = formats if formats is not None else []
+        if isinstance(self.formats, str):
+            self.formats = self.formats.split()
+            
         self.description = description
-        self.codecs = Codecs(self.configuration)
-        self.metadata = Metadata(self.configuration)
+        self.__codecs__ = None
+        self.__metadata__ = None
         self.metadata_files = []
         self.__extensions__ = None
+
+    @property
+    def codecs(self):
+        if self.__codecs__ is None:
+            self.__codecs__ = Codecs(self.configuration)
+        return self.__codecs__
+
+    @property
+    def metadata(self):
+        if self.__metadata__ is None:
+            self.__metadata__ = Metadata(self.configuration)
+        return self.__metadata__
 
     @property
     def codec(self):

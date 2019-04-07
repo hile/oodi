@@ -1,6 +1,7 @@
 
 import os
 import re
+import tempfile
 
 from .base import File
 from .exceptions import LibraryError
@@ -223,8 +224,12 @@ class Track(File):
         # Get album art
         albumart = self.tags.get_albumart()
 
+        tmpdir = tempfile.mkdtemp(prefix='oodi-')
+        broken = '{}/broken.m4a'.format(tmpdir)
+        fixed = '{}/fixed.m4a'.format(tmpdir)
+
         # Copy file to /tmp for processing
-        copyfile(self.path, '/tmp/broken.m4a')
+        copyfile(self.path, broken)
 
         # Use afconvert to create new file. This will have correct container type
         check_output((
@@ -233,12 +238,12 @@ class Track(File):
             '-f', 'm4af',
             '-d', 'aac',
             '--soundcheck-generate',
-            '/tmp/broken.m4a',
-            '/tmp/fixed.m4a'
+            broken,
+            fixed,
         ))
 
         # Add existing tags back to fixed file
-        self.tags.load('/tmp/fixed.m4a')
+        self.tags.load(fixed)
         self.tags.update(**tags)
 
         # Embed album art
@@ -246,4 +251,11 @@ class Track(File):
             self.tags.set_albumart(albumart)
 
         # Copy fixed file back in place
-        copyfile('/tmp/fixed.m4a', self.path)
+        copyfile(fixed, self.path)
+
+        try:
+            os.unlink(broken)
+            os.unlink(fixed)
+            os.rmdir(tmpdir)
+        except Exception:
+            pass

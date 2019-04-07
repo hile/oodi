@@ -171,9 +171,14 @@ class ValueTotalCountTag:
                     raise ValueError
             except Exception:
                 raise ValueError('Invalid numbering tag value {}'.format(value))
+
             if attr == 'value':
+                if self.total is 0:
+                    self.total = value
                 self.value = value
             elif attr == 'total':
+                if self.value is None:
+                    self.value = self.parser.track_number
                 self.total = value
 
         if self.value is None:

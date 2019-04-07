@@ -77,12 +77,8 @@ class Directory(FilesystemItem):
         """
         super().__init__(configuration, path)
 
-        self.path = os.path.expandvars(os.path.expanduser(path))
         self.__iterable__ = iterable
         self.reset()
-
-    def __iter__(self):
-        return self
 
     def __len__(self):
         """
@@ -105,6 +101,9 @@ class Directory(FilesystemItem):
 
         return iterable
 
+    def __iter__(self):
+        return self
+
     def __load_next__(self):
         """
         Load next iterable item
@@ -119,7 +118,7 @@ class Directory(FilesystemItem):
                 root, dirs, files = next(self.__iterator__)
                 dirs.sort()
             except StopIteration:
-                self.__index__ = None
+                self.__file_index__ = None
                 self.__loaded__ = True
                 raise StopIteration
 
@@ -130,17 +129,17 @@ class Directory(FilesystemItem):
                     self.add_file(root, filename)
 
         if self.__iterator__ is None:
-            self.__index__ = 0
             self.__iterator__ = os.walk(self.path, followlinks=True)
+            self.__file_index__ = 0
             get_next_slice()
 
         try:
-            item = self.__get_iterable__()[self.__index__]
+            item = self.__get_iterable__()[self.__file_index__]
         except IndexError:
             get_next_slice()
             return self.__load_next__()
 
-        self.__index__ += 1
+        self.__file_index__ += 1
         return item
 
     def __next__(self):
@@ -156,16 +155,16 @@ class Directory(FilesystemItem):
             return self.__load_next__()
 
         else:
-            if self.__index__ is None:
-                self.__index__ = 0
+            if self.__file_index__ is None:
+                self.__file_index__ = 0
 
             try:
-                item = self.__get_iterable__()[self.__index__]
+                item = self.__get_iterable__()[self.__file_index__]
             except IndexError:
-                self.__index__ = 0
+                self.__file_index__ = 0
                 raise StopIteration
 
-            self.__index__ += 1
+            self.__file_index__ += 1
             return item
 
     @property
@@ -229,7 +228,7 @@ class Directory(FilesystemItem):
 
         self.__loaded__ = False
         self.__iterator__ = None
-        self.__index__ = None
+        self.__file_index__ = None
 
     def load(self):
         """

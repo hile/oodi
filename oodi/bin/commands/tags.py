@@ -43,6 +43,7 @@ class Tags(Command):
             for track in arg:
                 tags = track.tags
                 if tags:
+                    print('update', track, updated_tags)
                     tags.update(**updated_tags)
 
     def list_tags(self, args):
