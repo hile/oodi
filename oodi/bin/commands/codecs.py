@@ -21,7 +21,7 @@ class Codecs(Command):
 
     def list_codecs(self, args):
         for codec in self.codecs:
-            print(codec)
+            self.message(codec)
 
     def show_codec_details(self, args):
         self.codecs

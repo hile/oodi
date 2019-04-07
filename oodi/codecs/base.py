@@ -173,7 +173,7 @@ class ValueTotalCountTag:
                 raise ValueError('Invalid numbering tag value {}'.format(value))
 
             if attr == 'value':
-                if self.total is 0:
+                if self.total == 0:
                     self.total = value
                 self.value = value
             elif attr == 'total':

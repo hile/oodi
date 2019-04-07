@@ -70,7 +70,6 @@ class OodiShellCommandParser(ShellCommandParser):
         Execute shell command collecting output
         """
 
-        print('run command', args)
         p = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
         rval = None
@@ -86,6 +85,5 @@ class OodiShellCommandParser(ShellCommandParser):
                     break
             time.sleep(1)
             rval = p.poll()
-            print('rval', rval)
 
         return rval

@@ -43,7 +43,6 @@ class Tags(Command):
             for track in arg:
                 tags = track.tags
                 if tags:
-                    print('update', track, updated_tags)
                     tags.update(**updated_tags)
 
     def list_tags(self, args):
@@ -55,18 +54,18 @@ class Tags(Command):
                 tags = track.tags
                 if tags:
                     for tag, value in tags:
-                        print('{:20} {}'.format(tag, value))
+                        self.message('{:20} {}'.format(tag, value))
 
     def list_magic_strings(self, args):
         for arg in self.get_tracks(args.paths):
             for track in arg:
-                print('{}: {}'.format(track.path, track.magic))
+                self.message('{}: {}'.format(track.path, track.magic))
 
     def fix_itunes_containers(self, args):
         for arg in self.get_tracks(args.paths):
             for track in arg:
                 if track.requires_aac_itunes_fix():
-                    print('FIX   {}'.format(track))
+                    self.message('FIX   {}'.format(track))
                     track.fix_aac_for_itunes()
                 else:
-                    print('OK    {}'.format(track))
+                    self.message('OK    {}'.format(track))

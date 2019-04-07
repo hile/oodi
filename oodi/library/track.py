@@ -215,7 +215,6 @@ class Track(File):
 
         # Check this is actually of broken type
         if magic != ITUNES_BROKEN_AAC_MAGIC:
-            print('{} unexpected magic string: {}'.format(self.path, magic))
             return
 
         # Get tag items to process to be added back to corrected file

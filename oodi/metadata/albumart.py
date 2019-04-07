@@ -122,7 +122,6 @@ class AlbumArt(FilesystemItem):
             raise AlbumArtError('Unsupported PIL image format: {}'.format(self.__image__.format))
 
         if self.__image__.mode != 'RGB':
-            print('convert to RGB')
             self.__image__ = self.__image__.convert('RGB')
 
     def load_data(self, data):

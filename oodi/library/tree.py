@@ -26,7 +26,7 @@ class Tree(Directory):
         self.formats = formats if formats is not None else []
         if isinstance(self.formats, str):
             self.formats = self.formats.split()
-            
+
         self.description = description
         self.__codecs__ = None
         self.__metadata__ = None
