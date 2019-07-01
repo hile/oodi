@@ -1,4 +1,5 @@
 
+import hashlib
 import magic
 import os
 
@@ -14,6 +15,7 @@ class FilesystemItem:
         self.configuration = configuration
         if path is not None:
             path = os.path.expandvars(os.path.expanduser(path))
+        self.__checksums__ = {}
         self.path = path
 
     def __repr__(self):
@@ -27,6 +29,13 @@ class FilesystemItem:
             return os.stat(self.path)
         except Exception as e:
             raise LibraryError('Error running stat on {}: {}'.format(self.path, e))
+
+    @property
+    def sha256(self):
+        if 'sha256' not in self.__checksums__:
+            with open(self.path, "rb") as fd:
+                self.__checksums__['sha256'] = hashlib.sha256(fd.read()).hexdigest()
+        return self.__checksums__['sha256']
 
     @property
     def uid(self):
@@ -47,6 +56,14 @@ class FilesystemItem:
     @property
     def mtime(self):
         return self.__stat__().st_mtime
+
+    @property
+    def mode(self):
+        return self.__stat__().st_mode
+
+    @property
+    def size(self):
+        return self.__stat__().st_size
 
 
 class Directory(FilesystemItem):
