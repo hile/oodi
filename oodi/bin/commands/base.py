@@ -26,7 +26,7 @@ class Command(ScriptCommand):
         iterators = []
         for path in paths:
             try:
-                iterators.append(IterableTrackPaths(self.script.configuration, path))
+                iterators.append(IterableTrackPaths(path, self.script.configuration))
             except LibraryError as e:
                 self.error(e)
         return iterators

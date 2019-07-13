@@ -22,9 +22,9 @@ class ConfigurationSection(dict):
     defaults = os.path.join(__file__, 'defaults.yaml')
     default_configuration = {}
 
-    def __init__(self, configuration):
+    def __init__(self, configuration=None):
         super().__init__()
-        self.configuration = configuration
+        self.configuration = configuration if configuration is not None else Configuration()
 
         if os.path.isfile(self.defaults):
             self.load_configuration_file(self.defaults)

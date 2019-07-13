@@ -5,6 +5,7 @@ import tempfile
 
 from .base import File
 from .exceptions import LibraryError
+from .metadata import TrackJSONMetadata
 
 # Regexp patterns to match track filenames
 TRACKNAME_PATTERNS = (
@@ -32,6 +33,7 @@ class Track(File):
         self.extension = None
         self.__parse_details_from_filename__()
 
+        self.__metadata__ = None
         self.__tagparser__ = None
         self.__tree__ = None
 
@@ -69,6 +71,12 @@ class Track(File):
         if self.__tree__ is None:
             self.__tree__ = self.configuration.library.find_tree_by_prefix(self.path)
         return self.__tree__
+
+    @property
+    def metadata(self):
+        if self.__metadata__ is None:
+            self.__metadata__ = TrackJSONMetadata(self.__tree__, self)
+        return self.__metadata__
 
     @property
     def relative_path(self):

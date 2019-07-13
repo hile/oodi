@@ -3,7 +3,86 @@ import hashlib
 import magic
 import os
 
+from systematic.shell import normalized
+
 from .exceptions import LibraryError
+from ..configuration import Configuration
+
+
+class Path(str):
+    """
+    Filesystem path item with some extra attributes
+    """
+
+    def __new__(self, path):
+        return str.__new__(self, normalized(path))
+
+    @property
+    def exists(self):
+        """
+        Checks if path exists
+        """
+        if os.path.isdir(self) or os.path.isfile(self) or os.path.islink(self):
+            return True
+        return False
+
+    @property
+    def isdir(self):
+        """
+        Checks if path is directory
+        """
+        return os.path.isdir(self)
+
+    @property
+    def isfile(self):
+        """
+        Checks if path is file
+        """
+        return os.path.isfile(self)
+
+    @property
+    def islink(self):
+        """
+        Checks if path is link
+        """
+        return os.path.isfile(self)
+
+    @property
+    def no_ext(self):
+        """
+        Return path without extension
+        """
+        return os.path.splitext(self)[0]
+
+    @property
+    def directory(self):
+        """
+        Return parent directory for path
+        """
+        return os.path.dirname(self)
+
+    @property
+    def filename(self):
+        """
+        Return path filename part
+        """
+        return os.path.basename(self)
+
+    @property
+    def extension(self):
+        """
+        Return path extension without leading .
+        """
+        return os.path.splitext(self)[1][1:]
+
+    def relative_path(self, path):
+        """Return relative path
+
+        Return item's relative path compared to specified path
+        """
+        if path[:len(self)] != self:
+            raise ValueError('{} path is not relative to {}'.format(path, self))
+        return path[len(self):].lstrip('/')
 
 
 class FilesystemItem:
@@ -11,8 +90,8 @@ class FilesystemItem:
     Common filesystem item base class
     """
 
-    def __init__(self, configuration, path):
-        self.configuration = configuration
+    def __init__(self, path, configuration=None):
+        self.configuration = configuration if configuration is not None else Configuration()
         if path is not None:
             path = os.path.expandvars(os.path.expanduser(path))
         self.__checksums__ = {}
@@ -85,14 +164,14 @@ class Directory(FilesystemItem):
         '.DS_Store',
     )
 
-    def __init__(self, configuration, path, iterable='files'):
+    def __init__(self, path, configuration=None, iterable='files'):
         """
         Initialize iterable directory
 
         Argument iterable must be name of the attribute being iterated, in this implementation
         'directories' or 'files' unless class is extended to do something else.
         """
-        super().__init__(configuration, path)
+        super().__init__(path, configuration)
 
         self.__iterable__ = iterable
         self.reset()
@@ -196,13 +275,16 @@ class Directory(FilesystemItem):
         """
         Return path relative to root of tree
         """
-        root = self.parent
-        while True:
-            if root.parent:
-                root = root.parent
-            else:
-                break
-        return self.path[len(root.path) + 1:]
+        if self.parent is not None:
+            root = self.parent
+            while True:
+                if root.parent:
+                    root = root.parent
+                else:
+                    break
+            return self.path[len(root.path) + 1:]
+        else:
+            return ''
 
     def add_directory(self, root, directory):
         """
@@ -213,7 +295,7 @@ class Directory(FilesystemItem):
         if directory in self.ignored_tree_folder_names:
             return
 
-        item = Directory(self.configuration, os.path.join(root, directory), iterable=self.__iterable__)
+        item = Directory(os.path.join(root, directory), configuration=self.configuration, iterable=self.__iterable__)
         self.__directory_index__[item.path] = item
         if root in self.__directory_index__:
             item.parent = self.__directory_index__[root]
@@ -228,7 +310,7 @@ class Directory(FilesystemItem):
         if filename in self.ignored_filenames:
             return
 
-        item = File(self.configuration, os.path.join(root, filename))
+        item = File(os.path.join(root, filename, configuration=self.configuration))
         if root in self.__directory_index__:
             item.parent = self.__directory_index__[root]
         self.files.append(item)
@@ -271,8 +353,11 @@ class File(FilesystemItem):
         """
         Return file magic string
         """
-        with magic.Magic() as m:
-            return m.id_filename(self.path)
+        try:
+            with magic.Magic() as m:
+                return m.id_filename(self.path)
+        except Exception:
+            return ''
 
 
 class Libraries:
@@ -280,8 +365,8 @@ class Libraries:
     Loader for configured libraries
     """
 
-    def __init__(self, configuration):
-        self.configuration = configuration
+    def __init__(self, configuration=None):
+        self.configuration = configuration if configuration is not None else Configuration()
         self.trees = []
         self.__initialize_trees__()
 
@@ -336,9 +421,9 @@ class Libraries:
                 raise LibraryError('Tree already in library: {}'.format(path))
 
         self.trees.append(Tree(
-            self.configuration,
             path,
-            'files',
+            configuration=self.configuration,
+            iterable='files',
             formats=formats,
             description=description,
         ))

@@ -7,6 +7,7 @@ from oodi.constants import DEFAULT_CONFIG_PATH
 from .commands.albumart import AlbumartCommand
 from .commands.codecs import Codecs
 from .commands.libraries import Libraries
+from .commands.metadata import Metadata
 from .commands.tags import Tags
 
 USAGE = """Oodi music library management tool
@@ -37,6 +38,7 @@ def main():
     script.add_subcommand(Codecs())
     script.add_subcommand(Libraries())
     script.add_subcommand(AlbumartCommand())
+    script.add_subcommand(Metadata())
     script.add_subcommand(Tags())
 
     script.run()

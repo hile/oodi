@@ -35,11 +35,11 @@ class CodecEncoders(unittest.TestCase):
 
         # Raises LibraryError because .m4a matches multiple codecs
         with self.assertRaises(LibraryError):
-            track = Track(self.configuration, filename)
+            track = Track(filename, configuration=self.configuration)
             output_file = track.encode(self.input_file, remove_input_file=False)
 
         # Specifying explicit format allows encoding
-        track = Track(self.configuration, filename, format='aac')
+        track = Track(filename, configuration=self.configuration, format='aac')
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -51,7 +51,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.aif')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -66,11 +66,11 @@ class CodecEncoders(unittest.TestCase):
 
         # Raises LibraryError because .alac matches multiple codecs
         with self.assertRaises(LibraryError):
-            track = Track(self.configuration, filename)
+            track = Track(filename, self.configuration)
             output_file = track.encode(self.input_file, remove_input_file=False)
 
         # Specifying explicit format allows encoding
-        track = Track(self.configuration, filename, format='alac')
+        track = Track(filename, configuration=self.configuration, format='alac')
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -81,7 +81,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.caf')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -92,7 +92,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.flac')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -104,7 +104,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.mp3')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -116,7 +116,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.opus')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -128,7 +128,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.ogg')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))
@@ -140,7 +140,7 @@ class CodecEncoders(unittest.TestCase):
 
         filename = self.configuration.get_temporary_file_path('test.wv')
 
-        track = Track(self.configuration, filename)
+        track = Track(filename, configuration=self.configuration)
         output_file = track.encode(self.input_file, remove_input_file=False)
         self.assertEqual(output_file, track.path)
         self.assertTrue(os.path.isfile(output_file))

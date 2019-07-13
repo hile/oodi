@@ -1,15 +1,15 @@
 
 
-class Metadata:
+class MetadataLoader:
     """
     Supported metadata file types
     """
-    def __init__(self, configuration):
+    def __init__(self, configuration=None):
         from .albumart import AlbumArt
 
         self.configuration = configuration
         self.loaders = (
-            AlbumArt(self.configuration),
+            AlbumArt,
         )
 
     def find_metadata_type_for_extension(self, extension):
@@ -18,4 +18,4 @@ class Metadata:
 
         May return multiple
         """
-        return [metadata for metadata in self.loaders if extension in metadata.extensions]
+        return [loader for loader in self.loaders if extension in loader(configuration=self.configuration).extensions]

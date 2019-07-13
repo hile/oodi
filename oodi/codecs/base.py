@@ -406,6 +406,12 @@ class BaseTagParser(AudiofileProcessorBaseClass):
 
         return items
 
+    def has_albumart(self):
+        """
+        Check if file has album art tag
+        """
+        raise NotImplementedError('has_albumart must be defined in child class')
+
     def get_albumart(self):
         """
         Return album art from tags
@@ -418,6 +424,16 @@ class BaseTagParser(AudiofileProcessorBaseClass):
         """
         raise NotImplementedError('set_albumart must be defined in child class')
 
+    def save_albumart(self, path):
+        """
+        Return album art from tags to a file
+        """
+        albumart = self.get_albumart()
+        if albumart:
+            albumart.save(path)
+        else:
+            raise TagError('No albumart detected in file')
+        return albumart
 
 class GenericAudioFile(AudiofileProcessorBaseClass):
     """

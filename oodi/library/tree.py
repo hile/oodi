@@ -2,12 +2,13 @@
 import os
 
 from ..codecs.base import Codecs
-from ..metadata.base import Metadata
+from ..configuration import Configuration
+from ..metadata.base import MetadataLoader
 
 from .base import Directory
 from .exceptions import LibraryError
 from .track import Track
-from .metadata import MetadataFile
+from .metadata import LibraryJSONMetadata
 
 
 class Tree(Directory):
@@ -20,30 +21,33 @@ class Tree(Directory):
     of files from tree to files with matching extensions only.
     """
 
-    def __init__(self, configuration, path, iterable='files', formats=None, description=None):
-        super().__init__(configuration, path, iterable)
+    def __init__(self, path, configuration=None, iterable='files', formats=None, description=None):
+        super().__init__(path, configuration=configuration, iterable=iterable)
+
+        self.__metadata_loader__ = MetadataLoader(self.configuration)
+        self.metadata_files = []
 
         self.formats = formats if formats is not None else []
         if isinstance(self.formats, str):
             self.formats = self.formats.split()
 
         self.description = description
+
+        self.__library_metadata__ = None
         self.__codecs__ = None
-        self.__metadata__ = None
-        self.metadata_files = []
         self.__extensions__ = None
+
+    @property
+    def metadata(self):
+        if self.__library_metadata__ is None:
+            self.__library_metadata__ = LibraryJSONMetadata(self)
+        return self.__library_metadata__
 
     @property
     def codecs(self):
         if self.__codecs__ is None:
             self.__codecs__ = Codecs(self.configuration)
         return self.__codecs__
-
-    @property
-    def metadata(self):
-        if self.__metadata__ is None:
-            self.__metadata__ = Metadata(self.configuration)
-        return self.__metadata__
 
     @property
     def codec(self):
@@ -96,11 +100,15 @@ class Tree(Directory):
         if directory in self.ignored_tree_folder_names:
             return
 
-        item = Tree(self.configuration, os.path.join(root, directory), iterable=self.__iterable__)
+        item = Tree(os.path.join(root, directory), configuration=self.configuration, iterable=self.__iterable__)
         self.__directory_index__[item.path] = item
         if root in self.__directory_index__:
             item.parent = self.__directory_index__[root]
         self.directories.append(item)
+
+    def reset(self):
+        super().reset()
+        self.metadata_files = []
 
     def add_file(self, root, filename):
         """
@@ -116,16 +124,18 @@ class Tree(Directory):
         name, extension = os.path.splitext(filename)
         if self.codecs.find_codecs_for_extension(extension[1:]):
             if self.__validate_extension__(filename):
-                item = Track(self.configuration, os.path.join(root, filename))
+                item = Track(os.path.join(root, filename), configuration=self.configuration)
                 if root in self.__directory_index__:
                     item.parent = self.__directory_index__[root]
                 self.files.append(item)
 
-        if self.metadata.find_metadata_type_for_extension(extension[1:]):
-            item = MetadataFile(self.configuration, os.path.join(root, filename))
-            if root in self.__directory_index__:
-                item.parent = self.__directory_index__[root]
-            self.metadata_files.append(item)
+        else:
+            loaders = self.__metadata_loader__.find_metadata_type_for_extension(extension[1:])
+            if len(loaders) == 1:
+                item = loaders[0](os.path.join(root, filename), configuration=self.configuration)
+                if root in self.__directory_index__:
+                    item.parent = self.__directory_index__[root]
+                self.metadata_files.append(item)
 
 
 class IterableTrackPaths:
@@ -133,11 +143,13 @@ class IterableTrackPaths:
     Loader for directories and files as paths, returning always iterable that
     iterates Track objects
     """
-    def __init__(self, configuration, path):
+    def __init__(self, path, configuration=None):
+        if configuration is None:
+            configuration = Configuration()
         if os.path.isfile(path):
-            self.item = iter([Track(configuration, path)])
+            self.item = iter([Track(path, configuration=configuration)])
         elif os.path.isdir(path):
-            self.item = Tree(configuration, path)
+            self.item = Tree(path, configuration=configuration)
         else:
             raise LibraryError('Invalid path: {}'.format(path))
 

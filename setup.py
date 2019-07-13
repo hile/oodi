@@ -20,12 +20,14 @@ setup(
     },
     install_requires=(
         'filemagic',
+        'lxml',
         'mutagen',
         'requests',
         'ruamel.yaml',
         'pillow',
         'systematic',
     ),
+    setup_requires=['pytest-runner'],
     tests_require=(
         'pytest',
         'pytest-runner',
@@ -37,7 +39,6 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: Python Software Foundation License',
         'Operating System :: POSIX',
-        'Operating System :: MacOS :: MacOS X',
         'Programming Language :: Python :: 3',
         'Topic :: System',
         'Topic :: System :: Systems Administration',

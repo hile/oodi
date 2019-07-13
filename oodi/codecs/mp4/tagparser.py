@@ -1,5 +1,5 @@
 
-from mutagen.mp4 import MP4, MP4Cover, MP4MetadataValueError
+from mutagen.mp4 import MP4, MP4Cover, MP4MetadataValueError, MP4StreamInfoError
 
 from oodi.metadata.albumart import AlbumArt
 from oodi.codecs.base import BaseTagParser, ValueTotalCountTag, TagError
@@ -50,6 +50,16 @@ class MP4TagParser(BaseTagParser):
     track_numbering_tag = 'trkn'
     disk_numbering_tag = 'disk'
 
+    def load(self, path):
+        """
+        Handle stream errors when loading
+        """
+        try:
+            return super().load(path)
+        except MP4StreamInfoError as e:
+            raise TagError('Error loading {}: {}'.format(path, e))
+
+
     def __format_tag__(self, tag, value):
         """
         Format tag to internal tag presentation
@@ -60,14 +70,20 @@ class MP4TagParser(BaseTagParser):
 
         return value
 
+    def has_albumart(self):
+        """
+        Check if albumart tag exists
+        """
+        return ALBUMART_TAG in self.__entry__
+
     def get_albumart(self):
         """
         Get data from tag to Albumart object
         """
         if ALBUMART_TAG in self.__entry__:
-            return AlbumArt(
-                configuration=self.configuration, path=None
-            ).load_data(self.__entry__[ALBUMART_TAG][0])
+            albumart = AlbumArt(configuration=self.configuration, path=None)
+            albumart.load_data(self.__entry__[ALBUMART_TAG][0])
+            return albumart
         else:
             return None
 

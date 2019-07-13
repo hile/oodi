@@ -5,7 +5,7 @@ import os
 from io import BytesIO
 from PIL import ImageFile
 
-from ..library.base import FilesystemItem
+from ..library.base import File
 
 from .constants import ALBUMART_FILENAMES, ALBUMART_EXTENSIONS
 
@@ -29,19 +29,64 @@ class AlbumArtError(Exception):
     pass
 
 
-class AlbumArt(FilesystemItem):
+class AlbumArt(File):
     """
     Album art files
     """
     extensions = ALBUMART_EXTENSIONS
 
-    def __init__(self, configuration, path=None):
-        super().__init__(configuration, path)
+    def __init__(self, path=None, configuration=None):
+        super().__init__(path, configuration=configuration)
         self.__image__ = None
         self.__mimetype__ = None
 
-        if path is not None:
-            self.load_file(path)
+        if self.path is not None and os.path.isfile(self.path):
+            self.load_file(self.path)
+
+    def __str__(self):
+        """
+        Return image information
+        """
+        if self.path is not None:
+            return self.path
+        else:
+            return '%(mime)s %(bytes)d bytes %(width)dx%(height)d' % self.info
+
+    def __len__(self):
+        """
+        Returns PIL image length as string
+        """
+
+        if not self.is_loaded:
+            return 0
+        return len(self.__image__.tobytes())
+
+    def __parse_image_data__(self, data):
+        """
+        Load the image from data with PIL
+        """
+
+        try:
+            parser = ImageFile.Parser()
+            parser.feed(data)
+            self.__image__ = parser.close()
+        except IOError:
+            raise AlbumArtError('Error parsing albumart image data')
+
+        try:
+            self.__mimetype__ = PIL_MIME_MAP[self.__image__.format]
+            if self.__mimetype__ is None:
+                raise AlbumArtError('Error detecting image format')
+        except KeyError:
+            self.__image__ = None
+            raise AlbumArtError('Unsupported PIL image format: {}'.format(self.__image__.format))
+
+        if self.__image__.mode != 'RGB':
+            self.__image__ = self.__image__.convert('RGB')
+
+    @property
+    def exists(self):
+        return self.path is not None and os.path.isfile(self.path)
 
     @property
     def is_loaded(self):
@@ -84,46 +129,6 @@ class AlbumArt(FilesystemItem):
             'colors': colors,
         }
 
-    def __str__(self):
-        """
-        Return image information
-        """
-        if not self.is_loaded:
-            return 'Uninitialized AlbumArt object.'
-        return '%(mime)s %(bytes)d bytes %(width)dx%(height)d' % self.info
-
-    def __len__(self):
-        """
-        Returns PIL image length as string
-        """
-
-        if not self.is_loaded:
-            return 0
-        return len(self.__image__.tobytes())
-
-    def __parse_image_data__(self, data):
-        """
-        Load the image from data with PIL
-        """
-
-        try:
-            parser = ImageFile.Parser()
-            parser.feed(data)
-            self.__image__ = parser.close()
-        except IOError:
-            raise AlbumArtError('Error parsing albumart image data')
-
-        try:
-            self.__mimetype__ = PIL_MIME_MAP[self.__image__.format]
-            if self.__mimetype__ is None:
-                raise AlbumArtError('Error detecting image format')
-        except KeyError:
-            self.__image__ = None
-            raise AlbumArtError('Unsupported PIL image format: {}'.format(self.__image__.format))
-
-        if self.__image__.mode != 'RGB':
-            self.__image__ = self.__image__.convert('RGB')
-
     def load_data(self, data):
         """
         Import albumart from metadata tag or database as bytes
@@ -141,6 +146,7 @@ class AlbumArt(FilesystemItem):
                 path,
             ))
 
+        self.path = path
         with open(path, 'rb') as fd:
             self.__parse_image_data__(fd.read())
 
@@ -210,13 +216,20 @@ class AlbumArt(FilesystemItem):
             raise AlbumArtError('Error saving {}: {}'.format(path, e))
 
 
-def detect_album_art(configuration, path):
+def default_album_art(path, configuration=None):
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+
+    return AlbumArt('{}/{}'.format(path, DEFAULT_ARTWORK_FILENAME, configuration=configuration))
+
+
+def detect_album_art(path, configuration=None):
     if os.path.isfile(path):
         path = os.path.dirname(path)
 
     for filename in ALBUMART_FILENAMES:
         filename = os.path.join(path, filename)
         if os.path.isfile(filename):
-            return AlbumArt(configuration, filename)
+            return AlbumArt(filename, configuration=configuration)
 
     return None

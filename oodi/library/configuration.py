@@ -18,7 +18,7 @@ class LibraryConfiguration(ConfigurationSection):
     def libraries(self):
         if not self.__libraries__:
             from .base import Libraries
-            self.__libraries__ = Libraries(self.configuration)
+            self.__libraries__ = Libraries(configuration=self.configuration)
         return self.__libraries__
 
     def find_tree_by_prefix(self, path):

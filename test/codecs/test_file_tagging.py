@@ -51,7 +51,7 @@ class CodecTags(unittest.TestCase):
 
         for name in TEST_NO_TAGGING_SUPPORT:
             testfile = os.path.join(TEST_FILES_PATH, name)
-            track = Track(configuration, testfile)
+            track = Track(testfile, configuration=configuration)
             self.assertIsNone(
                 track.codec.tagparser_class,
                 'Codec {} tagparser class is defined'.format(track.codec)
@@ -60,7 +60,7 @@ class CodecTags(unittest.TestCase):
 
         for name in TEST_FILES:
             testfile = os.path.join(TEST_FILES_PATH, name)
-            track = Track(configuration, testfile)
+            track = Track(testfile, configuration)
 
             self.assertIsNotNone(
                 track.codec.tagparser_class,
@@ -85,22 +85,22 @@ class CodecTags(unittest.TestCase):
             input_file = os.path.join(TEST_FILES_PATH, name)
             tag_file = configuration.get_temporary_file_path(name)
             shutil.copyfile(input_file, tag_file)
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertTrue(track.supports_tags, 'Track {} is expected to support tags'.format(tag_file))
 
             for tag, value in TEST_BASIC_TAGS.items():
                 setattr(track.tags, tag, value)
                 self.assertEqual(value, getattr(track.tags, tag))
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertDictEqual(track.tags.items(), TEST_BASIC_TAGS)
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             for tag in TEST_BASIC_TAGS:
                 delattr(track.tags, tag)
                 self.assertIsNone(getattr(track.tags, tag))
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertDictEqual(track.tags.items(), {})
 
     def test_tagging_common_tag_writing(self):
@@ -121,7 +121,7 @@ class CodecTags(unittest.TestCase):
             tag_file = configuration.get_temporary_file_path(name)
 
             shutil.copyfile(input_file, tag_file)
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertTrue(track.supports_tags, 'Track {} is expected to support tags'.format(tag_file))
 
             test_tags = {}
@@ -137,19 +137,19 @@ class CodecTags(unittest.TestCase):
                     'Error testing {} tag {}'.format(tag_file, tag)
                 )
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertDictEqual(
                 track.tags.items(),
                 test_tags,
                 'Error comparing {} tag dictionaries'.format(tag_file)
             )
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             for tag in test_tags:
                 delattr(track.tags, tag)
                 self.assertIsNone(getattr(track.tags, tag))
 
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertDictEqual(track.tags.items(), {})
 
     def test_tagging_track_numbering_writing(self):
@@ -166,7 +166,7 @@ class CodecTags(unittest.TestCase):
             tag_file = configuration.get_temporary_file_path(name)
 
             shutil.copyfile(input_file, tag_file)
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             self.assertTrue(track.supports_tags, 'Track {} is expected to support tags'.format(tag_file))
 
             for value in (-1, 0, '0/0', None, '0,' '-123.3'):
@@ -178,7 +178,7 @@ class CodecTags(unittest.TestCase):
                     track.tags.track_number = value
 
             shutil.copyfile(input_file, tag_file)
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             track.tags.track_number = '3'
             self.assertEqual(track.tags.track_number, 3)
             if track.codec.format in NUMBERING_REQUIRES_TOTAL:
@@ -187,7 +187,7 @@ class CodecTags(unittest.TestCase):
                 self.assertEqual(track.tags.total_tracks, None, 'Track {} total tracks mismatch'.format(tag_file))
 
             shutil.copyfile(input_file, tag_file)
-            track = Track(configuration, tag_file)
+            track = Track(tag_file, configuration)
             track.tags.track_number = '5/10'
             self.assertEqual(track.tags.track_number, 5)
             self.assertEqual(track.tags.total_tracks, 10)

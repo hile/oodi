@@ -32,7 +32,7 @@ class CodecDecoders(unittest.TestCase):
         configuration = Configuration()
         for name in TEST_FILES:
             testfile = os.path.join(TEST_FILES_PATH, name)
-            track = Track(configuration, testfile)
+            track = Track(testfile, configuration=configuration)
             output_file = track.decode()
             self.assertTrue(
                 os.path.isfile(output_file),
@@ -54,7 +54,7 @@ class CodecDecoders(unittest.TestCase):
             if os.path.isfile(output_file):
                 os.unlink(output_file)
             testfile = os.path.join(TEST_FILES_PATH, name)
-            track = Track(configuration, testfile)
+            track = Track(testfile, configuration)
             track.decode(output_file)
             self.assertTrue(
                 os.path.isfile(output_file),
