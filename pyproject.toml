@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "oodi"
+version = "3.0.0"
+description = "Python tools to manage music libraries and audio files"
+authors = ["Ilkka Tuohela <hile@iki.fi>"]
+readme = "README.md"
+include = [
+    "LICENSE",
+]
+license = "BSD"
+classifiers = [
+    "Environment :: Console",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Utilities",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pathlib-tree = "^2.2"
+lxml = "^4"
+mutagen = "^1"
+Pillow = "^9"
+requests = "^2"
+"ruamel.yaml" = "^0.17"
+
+[tool.poetry.group.dev.dependencies]
+coverage = "^7"
+flake8 = "^6"
+flake8-bugbear = "^22"
+flake8-quotes = "^3"
+pycodestyle = "^2"
+pyflakes = "^3"
+pylint = "^2"
+pytest = "^7"
+tox = "^4"
+
+[tool.poetry.scripts]
+oodi = "oodi.bin.oodi:main"
+
+[build-system]
+requires = ["poetry-core>=1.3.2"]
+build-backend = "poetry.core.masonry.api"
