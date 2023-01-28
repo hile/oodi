@@ -9,12 +9,7 @@ from sys_toolkit.configuration.yaml import YamlConfiguration
 
 from ..codecs.loader import Codecs
 from ..library.tree import Library
-from ..constants import (
-    DEFAULT_FILESYSTEM_ENCODING,
-)
-
-
-OODI_CONFIG_FILE = 'oodi.yml'
+from ..constants import DEFAULT_FILESYSTEM_ENCODING
 
 
 class Configuration(YamlConfiguration):
@@ -34,7 +29,8 @@ class Configuration(YamlConfiguration):
         """
         Return default configuration file path
         """
-        from ..constants import USER_CONFIG_DIRECTORY  # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
+        from ..constants import USER_CONFIG_DIRECTORY, OODI_CONFIG_FILE
         return USER_CONFIG_DIRECTORY.joinpath(OODI_CONFIG_FILE)
 
     def get_library(self,
