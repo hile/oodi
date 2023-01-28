@@ -7,6 +7,7 @@ from typing import List, Optional
 from sys_toolkit.configuration.base import ConfigurationSection
 from sys_toolkit.configuration.yaml import YamlConfiguration
 
+from ..codecs.loader import Codecs
 from ..library.tree import Library
 from ..constants import (
     DEFAULT_FILESYSTEM_ENCODING,
@@ -27,6 +28,7 @@ class Configuration(YamlConfiguration):
                  silent: bool = False) -> None:
         path = path if path is not None else self.__get_default_config_path__()
         super().__init__(path=path, parent=parent, debug_enabled=debug_enabled, silent=silent)
+        self.codecs = Codecs(self)
 
     def __get_default_config_path__(self) -> Path:
         """

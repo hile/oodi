@@ -17,6 +17,7 @@ def test_library_loader_properties(
     """
     assert not missing_tmpdir_directory.exists()
     obj = mock_empty_config.get_library(path=missing_tmpdir_directory)
+    assert obj.config == mock_empty_config
     assert isinstance(obj, Library)
     assert not missing_tmpdir_directory.exists()
 
