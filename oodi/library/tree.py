@@ -4,22 +4,39 @@ Oodi loader for folders of music files as music libraries
 from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING
 
-from pathlib_tree.tree import Tree
+from pathlib_tree.tree import Tree, TreeItem
 
 if TYPE_CHECKING:
     from oodi.configuration.loader import Configuration
+
+
+class LibraryItem(TreeItem):
+    """
+    File in audio library
+    """
+    config: 'Configuration'
+
+    # pylint: disable=unused-argument
+    def __init__(self, path: Path, config: Optional['Configuration'] = None) -> None:
+        self.config = config
+        TreeItem.__init__(self)
 
 
 class Library(Tree):
     """
     Oodi audio file library linked to oodi configuration
     """
+    __file_loader_class__ = LibraryItem
+
+    config: 'Configuration'
     label: str
     description: str
     default_format: str
     filesystem_encoding: str
     formats: List[str]
     excluded: List[str]
+    sorted: bool
+    mode: int
 
     # pylint: disable=redefined-builtin
     # pylint: disable=arguments-differ
@@ -28,8 +45,8 @@ class Library(Tree):
                 path: Path,
                 create_missing: bool = False,
                 sorted: bool = True,
-                mode: Optional[int] = None,
                 excluded: Optional[List[str]] = None,
+                mode: Optional[int] = None,
                 config: Optional['Configuration'] = None,
                 filesystem_encoding: Optional[str] = None,
                 default_format: Optional[str] = None,
@@ -45,7 +62,7 @@ class Library(Tree):
                  create_missing: bool = False,
                  sorted: bool = True,
                  mode: Optional[int] = None,
-                 excluded: bool = None,
+                 excluded: Optional[List[str]] = None,
                  config: Optional['Configuration'] = None,
                  filesystem_encoding: Optional[str] = None,
                  default_format: Optional[str] = None,

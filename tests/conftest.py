@@ -8,10 +8,16 @@ from typing import Iterator
 import pytest
 
 from oodi.configuration import Configuration
+from oodi.library.tree import Library
 
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
 MOCK_CONFIG_DIRECTORY = MOCK_DATA.joinpath('config/default')
 MOCK_EMPTY_CONFIG_DIRECTORY = MOCK_DATA.joinpath('config/empty')
+
+# Directory with whitenoise samples
+MOCK_WHITENOISE_SAMPLES_PATH = MOCK_DATA.joinpath('samples')
+MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT = 1
+MOCK_WHITENOISE_SAMPLES_COUNT = 6
 
 
 @pytest.fixture
@@ -75,3 +81,11 @@ def mock_empty_config(mock_empty_config_file) -> Iterator[Configuration]:
     Mock returning Configuration object with mock_empty_config_file fixture
     """
     yield Configuration()
+
+
+@pytest.fixture
+def mock_sample_library(mock_empty_config) -> Iterator[Library]:
+    """
+    Mock returning Library object for MOCK_WHITENOISE_SAMPLES_PATH directory
+    """
+    yield Library(config=mock_empty_config, path=MOCK_WHITENOISE_SAMPLES_PATH)

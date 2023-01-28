@@ -1,7 +1,12 @@
 """
 Unit tests for oodi.library.library module
 """
-from oodi.library.tree import Library
+from oodi.library.tree import Library, LibraryItem
+
+from ..conftest import (
+    MOCK_WHITENOISE_SAMPLES_COUNT,
+    MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
+)
 
 
 def test_library_loader_properties(
@@ -27,3 +32,17 @@ def test_library_loader_create_missing_directory(
     obj = mock_empty_config.get_library(path=missing_tmpdir_directory, create_missing=True)
     assert isinstance(obj, Library)
     assert missing_tmpdir_directory.exists()
+    assert obj.sorted is True
+
+
+def test_library_loader_sample_library_load(mock_sample_library):
+    """
+    Mock loading the test data directory with whitenoise samples
+    """
+    items = list(mock_sample_library)
+    assert len(items) == MOCK_WHITENOISE_SAMPLES_COUNT + MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
+    for item in items:
+        if item.is_file():
+            assert isinstance(item, LibraryItem)
+        else:
+            assert isinstance(item, Library)
