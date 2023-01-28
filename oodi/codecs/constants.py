@@ -8,24 +8,13 @@ class CodecFormat(Enum):
     """
     Enumerate various codec formats
     """
-    AAC = 'AAC'
-    AIFF = 'AIFF'
-    ALAC = 'ALAC'
-    FLAC = 'FLAC'
-    MP3 = 'MP3'
-    WAV = 'WAV'
-    VORBIS = 'VORBIS'
-
-
-COMPRESSED_FORMATS = (
-    CodecFormat.AAC,
-    CodecFormat.VORBIS,
-    CodecFormat.MP3,
-)
-
-LOSSLESS_CODECS = (
-    CodecFormat.AIFF,
-    CodecFormat.ALAC,
-    CodecFormat.FLAC,
-    CodecFormat.WAV,
-)
+    AAC = 'm4a'
+    AIFF = 'aiff'
+    ALAC = 'alac'
+    CAF = 'caf'
+    FLAC = 'flac'
+    MP3 = 'mp3'
+    OPUS = 'opus'
+    WAV = 'wab'
+    WAVPACK = 'wv'
+    VORBIS = 'ogg'

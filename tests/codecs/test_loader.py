@@ -1,8 +1,8 @@
 """
 Unit tests for oodi.codecs.loader module
 """
-
 from pathlib import Path
+from oodi.codecs.formats.base import Codec
 from oodi.codecs.loader import Codecs
 
 
@@ -24,6 +24,20 @@ def test_codecs_loader_get_codec_for_path_directory(mock_empty_config, tmpdir) -
     assert mock_empty_config.codecs.get_codec_for_path(path) is None
 
 
+def test_codecs_loader_get_codec_for_path_invalid_file(mock_empty_config) -> None:
+    """
+    Test looking up codec for unexpected filename
+    """
+    assert mock_empty_config.codecs.get_codec_for_path(Path(__file__)) is None
+
+
+def test_codecs_loader_get_codec_for_path_invalid_mimetype(mock_empty_config) -> None:
+    """
+    Test looking up codec for unexpected MIME type
+    """
+    assert mock_empty_config.codecs.get_codec_for_mimetype('text/plain') is None
+
+
 def test_codecs_loader_get_codec_for_path_without_extension(mock_empty_config, tmpdir) -> None:
     """
     Test looking up codec for a file missing file path without extension
@@ -31,3 +45,19 @@ def test_codecs_loader_get_codec_for_path_without_extension(mock_empty_config, t
     path = Path(tmpdir.strpath, 'empty-directory.wav')
     assert not path.exists()
     assert mock_empty_config.codecs.get_codec_for_path(path) is None
+
+
+def test_codecs_loader_get_valid_path(mock_empty_config, mock_codec_filename) -> None:
+    """
+    Test looking up a codec with all valid path from all codecs
+    """
+    codec = mock_empty_config.codecs.get_codec_for_path(mock_codec_filename)
+    assert isinstance(codec, Codec)
+
+
+def test_codecs_loader_get_valid_suffix(mock_empty_config, mock_codec_mimetype) -> None:
+    """
+    Test looking up a codec with all valid MIME types from all codecs
+    """
+    codec = mock_empty_config.codecs.get_codec_for_mimetype(mock_codec_mimetype)
+    assert isinstance(codec, Codec)
