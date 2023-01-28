@@ -38,7 +38,7 @@ class Configuration(YamlConfiguration):
     def get_library(self,
                     path: str,
                     create_missing: bool = False,
-                    sorted: bool = False,  # pylint: disable=redefined-builtin
+                    sorted: bool = True,  # pylint: disable=redefined-builtin
                     excluded: Optional[List[str]] = None,
                     filesystem_encoding: str = DEFAULT_FILESYSTEM_ENCODING,
                     default_format: Optional[str] = None,
