@@ -2,14 +2,12 @@
 Load oodi user configuratin file
 """
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from sys_toolkit.configuration.base import ConfigurationSection
 from sys_toolkit.configuration.yaml import YamlConfiguration
 
 from ..codecs.loader import Codecs
-from ..library.tree import Library
-from ..constants import DEFAULT_FILESYSTEM_ENCODING
 
 
 class Configuration(YamlConfiguration):
@@ -32,27 +30,3 @@ class Configuration(YamlConfiguration):
         # pylint: disable=import-outside-toplevel
         from ..constants import USER_CONFIG_DIRECTORY, OODI_CONFIG_FILE
         return USER_CONFIG_DIRECTORY.joinpath(OODI_CONFIG_FILE)
-
-    def get_library(self,
-                    path: str,
-                    create_missing: bool = False,
-                    sorted: bool = True,  # pylint: disable=redefined-builtin
-                    excluded: Optional[List[str]] = None,
-                    filesystem_encoding: str = DEFAULT_FILESYSTEM_ENCODING,
-                    default_format: Optional[str] = None,
-                    formats: Optional[List[str]] = None,
-                    description: Optional[str] = None) -> Library:
-        """
-        Return Library object for specified path and settings
-        """
-        return Library(
-            config=self,
-            path=path,
-            create_missing=create_missing,
-            sorted=sorted,
-            excluded=excluded,
-            filesystem_encoding=filesystem_encoding,
-            default_format=default_format,
-            formats=formats,
-            description=description
-        )

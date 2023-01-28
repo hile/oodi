@@ -7,6 +7,7 @@ from typing import Iterator
 
 import pytest
 
+from oodi.client import Oodi
 from oodi.configuration import Configuration
 from oodi.library.tree import Library
 
@@ -89,3 +90,19 @@ def mock_sample_library(mock_empty_config) -> Iterator[Library]:
     Mock returning Library object for MOCK_WHITENOISE_SAMPLES_PATH directory
     """
     yield Library(config=mock_empty_config, path=MOCK_WHITENOISE_SAMPLES_PATH)
+
+
+@pytest.fixture
+def oodi_empty_client(mock_empty_config_file) -> Iterator[Oodi]:
+    """
+    Yield Oodi client with mocked empty config
+    """
+    yield Oodi()
+
+
+@pytest.fixture
+def oodi_default_client(mock_default_config_file) -> Iterator[Oodi]:
+    """
+    Yield Oodi client with mocked default config
+    """
+    yield Oodi()
