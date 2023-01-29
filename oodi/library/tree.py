@@ -98,6 +98,7 @@ class Library(Tree):
                 excluded: Optional[List[str]] = None,
                 mode: Optional[int] = None,
                 config: Optional['Configuration'] = None,
+                library: Optional['Library'] = None,
                 filesystem_encoding: Optional[str] = None,
                 default_format: Optional[str] = None,
                 formats: Optional[List[str]] = None,
@@ -114,12 +115,14 @@ class Library(Tree):
                  mode: Optional[int] = None,
                  excluded: Optional[List[str]] = None,
                  config: Optional['Configuration'] = None,
+                 library: Optional['Library'] = None,
                  filesystem_encoding: Optional[str] = None,
                  default_format: Optional[str] = None,
                  formats: Optional[List[str]] = None,
                  label: Optional[str] = None,
                  description: Optional[str] = None) -> None:
 
+        self.library = library if library is not None else self
         self.config = config
         self.codecs = LibraryCodecs(self, default=default_format, formats=formats)
 
@@ -145,4 +148,5 @@ class Library(Tree):
             sorted=self.sorted,
             excluded=self.excluded,
             config=self.config,
+            library=self.library,
         )

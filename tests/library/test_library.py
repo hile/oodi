@@ -95,3 +95,4 @@ def test_library_loader_sample_library_load(mock_sample_library):
             assert isinstance(item, LibraryItem)
         else:
             assert isinstance(item, Library)
+            assert item.library == mock_sample_library
