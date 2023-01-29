@@ -41,7 +41,7 @@ def test_codecs_loader_get_codec_for_path_without_extension(mock_empty_config, t
     """
     Test looking up codec for a file missing file path without extension
     """
-    path = Path(tmpdir.strpath, 'empty-directory.wav')
+    path = Path(tmpdir.strpath, 'file-without-extension')
     assert not path.exists()
     assert mock_empty_config.codecs.get_codec_for_path(path) is None
 

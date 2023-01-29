@@ -15,7 +15,7 @@ class CodecFormat(Enum):
     FLAC = 'flac'
     MP3 = 'mp3'
     OPUS = 'opus'
-    WAV = 'wab'
+    WAV = 'wav'
     WAVPACK = 'wv'
     VORBIS = 'ogg'
 
