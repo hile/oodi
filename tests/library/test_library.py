@@ -1,6 +1,11 @@
 """
 Unit tests for oodi.library.library module
 """
+import pytest
+
+from oodi.exceptions import ConfigurationError
+from oodi.codecs.constants import CodecFormat
+from oodi.codecs.formats.base import Codec
 from oodi.library.tree import Library, LibraryItem
 
 from ..conftest import (
@@ -20,6 +25,49 @@ def test_library_loader_properties(
     assert obj.config == oodi_empty_client.config
     assert isinstance(obj, Library)
     assert not missing_tmpdir_directory.exists()
+
+    assert isinstance(obj.codecs.default, Codec)
+    assert isinstance(obj.codecs.formats, list)
+    for item in obj.codecs.formats:
+        assert isinstance(item, Codec)
+    assert isinstance(obj.codecs.suffixes, list)
+    for suffix in obj.codecs.suffixes:
+        assert isinstance(suffix, str)
+        assert suffix != ''
+        assert suffix[0] == '.'
+
+
+def test_library_loader_conflicting_codec_formats(
+        oodi_empty_client,
+        missing_tmpdir_directory) -> None:
+    """
+    Test loading a library with valid set of codec formats but with a default
+    codec that is not included in the list of specified codec formats
+    """
+    codec_formats = [CodecFormat.OPUS.value, CodecFormat.VORBIS.value]
+    with pytest.raises(ConfigurationError):
+        oodi_empty_client.get_library(
+            path=missing_tmpdir_directory,
+            default_format=CodecFormat.MP3.value,
+            formats=codec_formats,
+        )
+
+
+def test_library_loader_valid_codec_formats(
+        oodi_empty_client,
+        missing_tmpdir_directory) -> None:
+    """
+    Test loading a library with valid set of codec formats
+    """
+    codec_formats = [CodecFormat.OPUS.value, CodecFormat.VORBIS.value]
+    obj = oodi_empty_client.get_library(
+        path=missing_tmpdir_directory,
+        default_format=CodecFormat.OPUS.value,
+        formats=codec_formats,
+    )
+    assert obj.codecs.default.codec_format == CodecFormat.OPUS
+    for codec in obj.codecs.formats:
+        assert codec.codec_format.value in codec_formats
 
 
 def test_library_loader_create_missing_directory(

@@ -18,3 +18,6 @@ class CodecFormat(Enum):
     WAV = 'wab'
     WAVPACK = 'wv'
     VORBIS = 'ogg'
+
+
+DEFAULT_AUDIO_CODEC_FORMAT = CodecFormat.AAC

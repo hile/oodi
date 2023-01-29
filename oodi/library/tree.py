@@ -1,10 +1,16 @@
 """
 Oodi loader for folders of music files as music libraries
 """
+import itertools
+
 from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING
 
 from pathlib_tree.tree import Tree, TreeItem
+
+from ..exceptions import ConfigurationError
+from ..codecs.constants import DEFAULT_AUDIO_CODEC_FORMAT
+from ..codecs.formats.base import Codec
 
 if TYPE_CHECKING:
     from ..configuration.loader import Configuration
@@ -22,21 +28,47 @@ class LibraryItem(TreeItem):
         TreeItem.__init__(self)
 
 
+# pylint: disable=too-few-public-methods
 class LibraryCodecs:
     """
+    Link
     Container to list codecs linked to a Library object based on the formats specified
     for the library
     """
+    library: 'Library'
+    default: Optional[Codec]
+    formats: List[Codec]
+
     def __init__(self,
                  library: 'Library',
-                 default_format: Optional[str] = None,
+                 default: Optional[str] = None,
                  formats: Optional[List[str]] = None) -> None:
 
-        formats = formats if formats is not None else []
+        default = default if default is not None else DEFAULT_AUDIO_CODEC_FORMAT
+        if formats is None:
+            formats = [default]
 
         self.library = library
-        self.default_format = default_format
-        self.formats = formats
+        self.default = library.config.get_codec(default)
+        self.formats = [library.config.get_codec(value) for value in formats]
+
+        if self.default not in self.formats:
+            raise ConfigurationError(
+                f'Library configuration error: default codec {self.default} '
+                'is not in included in configured formats'
+            )
+
+    @property
+    def suffixes(self) -> List[str]:
+        """
+        Return suffixes for all configured codecs configured to self.formats
+
+        Values are ensured to contain a . in the beginning to match Path.suffix lookups
+        """
+        return [
+            f""".{suffix.lstrip('.')}"""
+            for suffix in sorted(set(itertools.chain(*[codec.suffixes for codec in self.formats])))
+        ]
 
 
 class Library(Tree):
@@ -89,7 +121,7 @@ class Library(Tree):
                  description: Optional[str] = None) -> None:
 
         self.config = config
-        self.codecs = LibraryCodecs(self, default_format=default_format, formats=formats)
+        self.codecs = LibraryCodecs(self, default=default_format, formats=formats)
 
         self.label = label if label else ''
         self.description = description if description else ''
@@ -102,4 +134,15 @@ class Library(Tree):
             sorted=sorted,
             mode=mode,
             excluded=excluded
+        )
+
+    def __load_tree__(self, item) -> 'Library':
+        """
+        Load sub directory as Library linked to this item
+        """
+        return self.__class__(
+            item,
+            sorted=self.sorted,
+            excluded=self.excluded,
+            config=self.config,
         )
