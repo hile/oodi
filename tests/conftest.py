@@ -20,6 +20,13 @@ MOCK_WHITENOISE_SAMPLES_PATH = MOCK_DATA.joinpath('samples')
 MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT = 2
 MOCK_WHITENOISE_SAMPLES_COUNT = 9
 
+# List of all sample files as standard Path objects from the test data directory
+WHITENOISE_SAMPLE_FILES = [
+    item
+    for item in list(MOCK_WHITENOISE_SAMPLES_PATH.glob('**/*'))
+    if item.is_file()
+]
+
 
 @pytest.fixture
 def mock_missing_config_file(monkeypatch, tmpdir) -> Iterator[Path]:
@@ -82,6 +89,14 @@ def mock_empty_config(mock_empty_config_file) -> Iterator[Configuration]:
     Mock returning Configuration object with mock_empty_config_file fixture
     """
     yield Configuration()
+
+
+@pytest.fixture(params=WHITENOISE_SAMPLE_FILES)
+def mock_sample_file(request) -> Iterator[Path]:
+    """
+    Mock request with full paths to the sample files in test data
+    """
+    yield request.param
 
 
 @pytest.fixture
