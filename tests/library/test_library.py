@@ -1,6 +1,7 @@
 """
 Unit tests for oodi.library.library module
 """
+from pathlib import Path
 import pytest
 
 from oodi.exceptions import ConfigurationError
@@ -84,7 +85,7 @@ def test_library_loader_create_missing_directory(
     assert obj.sorted is True
 
 
-def test_library_loader_sample_library_load(mock_sample_library):
+def test_library_loader_sample_library_load(mock_sample_library) -> None:
     """
     Mock loading the test data directory with whitenoise samples
     """
@@ -96,3 +97,14 @@ def test_library_loader_sample_library_load(mock_sample_library):
         else:
             assert isinstance(item, Library)
             assert item.library == mock_sample_library
+
+
+def test_library_loader_sample_library_relative_path(mock_sample_library) -> None:
+    """
+    Mock loading the test data directory with whitenoise samples
+    """
+    assert mock_sample_library.library_relative_path is None
+    items = list(mock_sample_library)
+    for item in items:
+        if item.is_dir():
+            assert isinstance(item.library_relative_path, Path)

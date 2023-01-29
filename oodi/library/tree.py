@@ -150,3 +150,16 @@ class Library(Tree):
             config=self.config,
             library=self.library,
         )
+
+    @property
+    def library_relative_path(self) -> Optional[Path]:
+        """
+        Return pathlib.Path object for the relative path against root library path or
+        None if this is the root library object
+
+        Returns:
+        pathlib.Path or None
+        """
+        if self.library == self:
+            return None
+        return Path(self.relative_to(self.library))
