@@ -7,7 +7,7 @@ from typing import List, Optional, TYPE_CHECKING
 from pathlib_tree.tree import Tree, TreeItem
 
 if TYPE_CHECKING:
-    from oodi.configuration.loader import Configuration
+    from ..configuration.loader import Configuration
 
 
 class LibraryItem(TreeItem):
@@ -22,6 +22,23 @@ class LibraryItem(TreeItem):
         TreeItem.__init__(self)
 
 
+class LibraryCodecs:
+    """
+    Container to list codecs linked to a Library object based on the formats specified
+    for the library
+    """
+    def __init__(self,
+                 library: 'Library',
+                 default_format: Optional[str] = None,
+                 formats: Optional[List[str]] = None) -> None:
+
+        formats = formats if formats is not None else []
+
+        self.library = library
+        self.default_format = default_format
+        self.formats = formats
+
+
 class Library(Tree):
     """
     Oodi audio file library linked to oodi configuration
@@ -29,6 +46,7 @@ class Library(Tree):
     __file_loader_class__ = LibraryItem
 
     config: 'Configuration'
+    codecs = LibraryCodecs
     label: str
     description: str
     default_format: str
@@ -71,12 +89,12 @@ class Library(Tree):
                  description: Optional[str] = None) -> None:
 
         self.config = config
-        self.default_format = default_format
-        self.formats = list(formats) if formats else []
-        self.filesystem_encoding = filesystem_encoding
+        self.codecs = LibraryCodecs(self, default_format=default_format, formats=formats)
+
         self.label = label if label else ''
         self.description = description if description else ''
         self.excluded = list(excluded) if isinstance(excluded, (tuple, list)) else []
+        self.filesystem_encoding = filesystem_encoding
 
         super().__init__(
             path=path,
