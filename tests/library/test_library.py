@@ -13,6 +13,7 @@ from ..conftest import (
     MOCK_WHITENOISE_SAMPLES_COUNT,
     MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
 )
+MOCK_MESSAGE = 'Mock debug message'
 
 
 def test_library_loader_properties(
@@ -108,3 +109,58 @@ def test_library_loader_sample_library_relative_path(mock_sample_library) -> Non
     for item in items:
         if item.is_dir():
             assert isinstance(item.library_relative_path, Path)
+
+
+def test_library_debug_disabled(mock_sample_library, capsys):
+    """
+    Test library debug method with debugging disabled
+    """
+    assert mock_sample_library.config.__debug_enabled__ is False
+    mock_sample_library.debug(MOCK_MESSAGE, mock_sample_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert captured.err == ''
+
+
+def test_library_debug_enabled(mock_sample_library, capsys):
+    """
+    Test library debug method with debugging enabled
+    """
+    mock_sample_library.config.__debug_enabled__ = True
+    mock_sample_library.debug(MOCK_MESSAGE, mock_sample_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert len(captured.err.splitlines()) == 1
+
+
+def test_library_error_message(mock_sample_library, capsys):
+    """
+    Test library error method with debugging disabled
+    """
+    assert mock_sample_library.config.__debug_enabled__ is False
+    mock_sample_library.error(MOCK_MESSAGE, mock_sample_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert len(captured.err.splitlines()) == 1
+
+
+def test_library_message_silent_disabled(mock_sample_library, capsys):
+    """
+    Test library debug method with silent flag disabled
+    """
+    assert mock_sample_library.config.__silent__ is False
+    mock_sample_library.message(MOCK_MESSAGE, mock_sample_library)
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    assert len(captured.out.splitlines()) == 1
+
+
+def test_library_message_silent_enabled(mock_sample_library, capsys):
+    """
+    Test library debug method with silent flag enabled
+    """
+    mock_sample_library.config.__silent__ = True
+    mock_sample_library.message(MOCK_MESSAGE, mock_sample_library)
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    assert captured.out == ''

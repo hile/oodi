@@ -4,7 +4,7 @@ Oodi loader for folders of music files as music libraries
 import itertools
 
 from pathlib import Path
-from typing import List, Optional, TYPE_CHECKING
+from typing import Any, List, Optional, TYPE_CHECKING
 
 from pathlib_tree.tree import Tree, TreeItem
 
@@ -163,3 +163,21 @@ class Library(Tree):
         if self.library == self:
             return None
         return Path(self.relative_to(self.library))
+
+    def debug(self, *args: List[Any]) -> None:
+        """
+        Send debug message to stderr if debug mode is enabled
+        """
+        self.config.debug(*args)
+
+    def error(self, *args: List[Any]) -> None:
+        """
+        Send error message to stderr
+        """
+        self.config.error(*args)
+
+    def message(self, *args: List[Any]) -> None:
+        """
+        Show message to stdout unless silent flag is set
+        """
+        self.config.message(*args)

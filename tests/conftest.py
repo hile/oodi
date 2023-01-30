@@ -17,7 +17,7 @@ MOCK_EMPTY_CONFIG_DIRECTORY = MOCK_DATA.joinpath('config/empty')
 
 # Directory with whitenoise samples
 MOCK_WHITENOISE_SAMPLES_PATH = MOCK_DATA.joinpath('samples')
-MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT = 2
+MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT = 3
 MOCK_WHITENOISE_SAMPLES_COUNT = 9
 
 # List of all sample files as standard Path objects from the test data directory
@@ -97,6 +97,14 @@ def mock_sample_file(request) -> Iterator[Path]:
     Mock request with full paths to the sample files in test data
     """
     yield request.param
+
+
+@pytest.fixture
+def mock_empty_library(mock_empty_config, tmpdir) -> Iterator[Library]:
+    """
+    Mock returning Library object for tmpdir directory
+    """
+    yield Library(config=mock_empty_config, path=Path(tmpdir.strpath))
 
 
 @pytest.fixture
