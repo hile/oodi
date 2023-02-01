@@ -1,8 +1,9 @@
 """
 Albums in music library
 """
+from collections.abc import MutableMapping
 from pathlib import Path
-from typing import Any, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Iterator, List, Optional, Union, TYPE_CHECKING
 
 from .file import AudioFile
 
@@ -51,6 +52,7 @@ class Album:
         audio_file = AudioFile(
             config=self.library.config,
             library=self.library,
+            album=self,
             path=audio_file,
             codec_format=codec_format
         )
@@ -63,3 +65,73 @@ class Album:
         Add a metadata file to the album
         """
         self.metadata.append(metadata_file)
+
+
+class AlbumPathLookup(MutableMapping):
+    """
+    Album lookup for albums in a library
+    """
+    def __init__(self, library: 'Library') -> None:
+        super().__init__()
+        self.library = library
+        self.__items__ = {}
+
+    def __delitem__(self, index: str) -> None:
+        """
+        Delete specified item from cache
+        """
+        self.__items__.__delitem__(index)
+
+    def __setitem__(self, index: str, value: Album) -> None:
+        """
+        Set specified value to given index
+        """
+        self.__items__.__setitem__(index, value)
+
+    def __getitem__(self, index: str) -> Album:
+        """
+        Get specified item from cache
+        """
+        return self.__items__.__getitem__(index)
+
+    def __len__(self) -> int:
+        """
+        Return size of collection
+        """
+        return len(self.__items__)
+
+    def __iter__(self) -> Iterator[Album]:
+        """
+        Set specified value to given index
+        """
+        return self.__items__.__iter__()
+
+    def debug(self, *args: List[Any]) -> None:
+        """
+        Send debug message to stderr if debug mode is enabled
+        """
+        self.library.debug(*args)
+
+    def error(self, *args: List[Any]) -> None:
+        """
+        Send error message to stderr
+        """
+        self.library.error(*args)
+
+    def message(self, *args: List[Any]) -> None:
+        """
+        Show message to stdout unless silent flag is set
+        """
+        self.library.message(*args)
+
+    def get_album_for_audio_file(self, item: 'LibraryItem') -> Album:
+        """
+        Return album for the folder of the specified audio file
+        """
+        album_relative_path = str(Path(item.relative_to(self.library).parent))
+        try:
+            album = self[album_relative_path]
+        except KeyError:
+            album = Album(self.library, album_relative_path)
+            self[album_relative_path] = album
+        return album

@@ -90,6 +90,7 @@ def test_library_loader_sample_library_load(mock_sample_library) -> None:
     """
     Mock loading the test data directory with whitenoise samples
     """
+    mock_sample_library.load()
     items = list(mock_sample_library)
     assert len(items) == MOCK_WHITENOISE_SAMPLES_COUNT + MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
     for item in items:
@@ -98,6 +99,8 @@ def test_library_loader_sample_library_load(mock_sample_library) -> None:
         else:
             assert isinstance(item, Library)
             assert item.library == mock_sample_library
+
+    assert len(mock_sample_library.audio_files) == MOCK_WHITENOISE_SAMPLES_COUNT
 
 
 def test_library_loader_sample_library_relative_path(mock_sample_library) -> None:

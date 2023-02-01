@@ -85,3 +85,75 @@ def test_album_add_audio_file(mock_album, mock_sample_file):
 
     mock_album.add_audio_file(mock_sample_file)
     assert len(mock_album.audio_files) == 1
+
+
+def test_album_path_lookup_properties(mock_empty_library, mock_album_relative_path, mock_album) -> None:
+    """
+    Test album path lookup object methods
+    """
+    assert len(mock_empty_library.albums) == 0
+    mock_empty_library.albums[mock_album_relative_path] = mock_album
+    assert len(mock_empty_library.albums) == 1
+
+    assert mock_empty_library.albums[mock_album_relative_path] == mock_album
+
+    albums = list(mock_empty_library.albums)
+    assert len(albums) == 1
+
+    del mock_empty_library.albums[mock_album_relative_path]
+    assert len(mock_empty_library.albums) == 0
+
+
+def test_album_path_lookup_debug_disabled(mock_empty_library, capsys):
+    """
+    Test album path lookup debug method with debugging disabled
+    """
+    assert mock_empty_library.config.__debug_enabled__ is False
+    mock_empty_library.albums.debug(MOCK_MESSAGE, mock_empty_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert captured.err == ''
+
+
+def test_album_path_lookup_debug_enabled(mock_empty_library, capsys):
+    """
+    Test album path lookup debug method with debugging enabled
+    """
+    mock_empty_library.config.__debug_enabled__ = True
+    mock_empty_library.albums.debug(MOCK_MESSAGE, mock_empty_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert len(captured.err.splitlines()) == 1
+
+
+def test_album_path_lookup_error_message(mock_empty_library, capsys):
+    """
+    Test album path lookup error method with debugging disabled
+    """
+    assert mock_empty_library.config.__debug_enabled__ is False
+    mock_empty_library.albums.error(MOCK_MESSAGE, mock_empty_library)
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert len(captured.err.splitlines()) == 1
+
+
+def test_album_path_lookup_message_silent_disabled(mock_empty_library, capsys):
+    """
+    Test album path lookup debug method with silent flag disabled
+    """
+    assert mock_empty_library.config.__silent__ is False
+    mock_empty_library.albums.message(MOCK_MESSAGE, mock_empty_library)
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    assert len(captured.out.splitlines()) == 1
+
+
+def test_album_path_lookup_message_silent_enabled(mock_empty_library, capsys):
+    """
+    Test album path lookup debug method with silent flag enabled
+    """
+    mock_empty_library.config.__silent__ = True
+    mock_empty_library.albums.message(MOCK_MESSAGE, mock_empty_library)
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    assert captured.out == ''

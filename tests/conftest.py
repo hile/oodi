@@ -8,6 +8,7 @@ from typing import Iterator
 import pytest
 
 from oodi.client import Oodi
+from oodi.codecs.constants import CodecFormat
 from oodi.configuration import Configuration
 from oodi.library.tree import Library
 
@@ -114,7 +115,11 @@ def mock_sample_library(mock_empty_config) -> Iterator[Library]:
     """
     Mock returning Library object for MOCK_WHITENOISE_SAMPLES_PATH directory
     """
-    yield Library(config=mock_empty_config, path=MOCK_WHITENOISE_SAMPLES_PATH)
+    yield Library(
+        config=mock_empty_config,
+        path=MOCK_WHITENOISE_SAMPLES_PATH,
+        formats=[codec_format.value for codec_format in CodecFormat]
+    )
 
 
 @pytest.fixture

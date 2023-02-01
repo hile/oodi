@@ -12,6 +12,9 @@ from ..exceptions import ConfigurationError
 from ..codecs.constants import DEFAULT_AUDIO_CODEC_FORMAT
 from ..codecs.formats.base import Codec
 
+from .album import AlbumPathLookup
+from .file import AudioFile
+
 if TYPE_CHECKING:
     from ..configuration.loader import Configuration
 
@@ -78,7 +81,8 @@ class Library(Tree):
     __file_loader_class__ = LibraryItem
 
     config: 'Configuration'
-    codecs = LibraryCodecs
+    codecs: LibraryCodecs
+    albums: AlbumPathLookup
     label: str
     description: str
     default_format: str
@@ -99,6 +103,7 @@ class Library(Tree):
                 mode: Optional[int] = None,
                 config: Optional['Configuration'] = None,
                 library: Optional['Library'] = None,
+                albums: Optional['AlbumPathLookup'] = None,
                 filesystem_encoding: Optional[str] = None,
                 default_format: Optional[str] = None,
                 formats: Optional[List[str]] = None,
@@ -116,14 +121,16 @@ class Library(Tree):
                  excluded: Optional[List[str]] = None,
                  config: Optional['Configuration'] = None,
                  library: Optional['Library'] = None,
+                 albums: Optional['AlbumPathLookup'] = None,
                  filesystem_encoding: Optional[str] = None,
                  default_format: Optional[str] = None,
                  formats: Optional[List[str]] = None,
                  label: Optional[str] = None,
                  description: Optional[str] = None) -> None:
 
-        self.library = library if library is not None else self
         self.config = config
+        self.library = library if library is not None else self
+        self.albums = albums if albums is not None else AlbumPathLookup(self)
         self.codecs = LibraryCodecs(self, default=default_format, formats=formats)
 
         self.label = label if label else ''
@@ -149,7 +156,18 @@ class Library(Tree):
             excluded=self.excluded,
             config=self.config,
             library=self.library,
+            albums=self.albums,
         )
+
+    def __load_file__(self, item: LibraryItem):
+        """
+        Load audio file to tree
+        """
+        item = super().__load_file__(item)
+        if item.suffix in self.codecs.suffixes:
+            album = self.albums.get_album_for_audio_file(item)
+            album.add_audio_file(item)
+        return item
 
     @property
     def library_relative_path(self) -> Optional[Path]:
@@ -163,6 +181,13 @@ class Library(Tree):
         if self.library == self:
             return None
         return Path(self.relative_to(self.library))
+
+    @property
+    def audio_files(self) -> List[AudioFile]:
+        """
+        Return audio files in all library albums
+        """
+        return list(itertools.chain(*[album.audio_files for album in self.albums.values()]))
 
     def debug(self, *args: List[Any]) -> None:
         """
@@ -181,3 +206,10 @@ class Library(Tree):
         Show message to stdout unless silent flag is set
         """
         self.config.message(*args)
+
+    def load(self) -> None:
+        """
+        Load files in the music library
+        """
+        self.reset()
+        list(self)

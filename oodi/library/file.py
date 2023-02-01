@@ -9,9 +9,11 @@ from ..codecs.formats.base import Codec
 
 if TYPE_CHECKING:
     from ..configuration import Configuration
+    from .album import Album
     from .tree import Library
 
 
+# pylint: disable=too-few-public-methods
 class AudioFile:
     """
     Audio file optionally linked to an album and library
@@ -20,10 +22,12 @@ class AudioFile:
                  config: 'Configuration',
                  path: Path,
                  library: Optional['Library'] = None,
+                 album: Optional['Album'] = None,
                  codec_format: Optional[CodecFormat] = None) -> None:
         self.config = config
         self.path = path.resolve()
         self.library = library
+        self.album = album
         self.codec = self.__detect_file_codec__(self.path, codec_format)
 
     def __detect_file_codec__(self,
