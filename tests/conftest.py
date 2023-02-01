@@ -11,6 +11,8 @@ from oodi.client import Oodi
 from oodi.configuration import Configuration
 from oodi.library.tree import Library
 
+MOCK_MESSAGE = 'Mock message'
+
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
 MOCK_CONFIG_DIRECTORY = MOCK_DATA.joinpath('config/default')
 MOCK_EMPTY_CONFIG_DIRECTORY = MOCK_DATA.joinpath('config/empty')

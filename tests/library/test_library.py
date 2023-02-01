@@ -10,10 +10,10 @@ from oodi.codecs.formats.base import Codec
 from oodi.library.tree import Library, LibraryItem
 
 from ..conftest import (
+    MOCK_MESSAGE,
     MOCK_WHITENOISE_SAMPLES_COUNT,
     MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
 )
-MOCK_MESSAGE = 'Mock debug message'
 
 
 def test_library_loader_properties(

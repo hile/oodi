@@ -9,6 +9,7 @@ from oodi.configuration import Configuration
 from oodi.library.file import AudioFile
 
 MOCK_FILENAME = ''
+MOCK_OTHER_FILE_NAME = 'A first sorting audiofile.wav'
 
 
 def validate_audiofile_properties(config: Configuration, obj: AudioFile) -> None:
@@ -40,3 +41,21 @@ def test_audio_file_missing_file(mock_empty_config, tmpdir) -> None:
     obj = AudioFile(mock_empty_config, path=path, codec_format=CodecFormat.ALAC)
     assert not obj.path.is_file()
     validate_audiofile_properties(mock_empty_config, obj)
+
+
+def test_audio_file_rich_comparison(mock_empty_config, mock_sample_file):
+    """
+    Test rich comparison methods of audiofile objects
+    """
+    a = AudioFile(mock_empty_config, path=Path(mock_sample_file.parent, MOCK_OTHER_FILE_NAME))
+    b = AudioFile(mock_empty_config, mock_sample_file)
+
+    assert a == a  # pylint: disable=comparison-with-itself
+    assert a != b
+
+    assert a < b
+    assert a <= b
+    assert a <= a  # pylint: disable=comparison-with-itself
+    assert b > a
+    assert b >= a
+    assert b >= b  # pylint: disable=comparison-with-itself
