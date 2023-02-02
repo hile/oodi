@@ -2,7 +2,7 @@
 Load oodi user configuratin file
 """
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from sys_toolkit.configuration.base import ConfigurationSection
 from sys_toolkit.configuration.yaml import YamlConfiguration
@@ -33,6 +33,19 @@ class Configuration(YamlConfiguration):
         # pylint: disable=import-outside-toplevel
         from ..constants import USER_CONFIG_DIRECTORY, OODI_CONFIG_FILE
         return USER_CONFIG_DIRECTORY.joinpath(OODI_CONFIG_FILE)
+
+    def get_codec_formats(self, names: Optional[List[Union[str, CodecFormat]]] = None) -> List[CodecFormat]:
+        """
+        Return list of CodecFormat values matching specified names, or all CodecFormat
+        objects if no names are specified
+        """
+        if not names:
+            return list(CodecFormat)
+        return [
+            codec_format
+            for codec_format in CodecFormat
+            if codec_format in names or codec_format.value in names
+        ]
 
     def get_codec(self, value: Optional[Union[str, CodecFormat]] = None) -> Optional[Codec]:
         """

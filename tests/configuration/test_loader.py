@@ -3,6 +3,7 @@ Unit tests for oodi.configuration.loader module
 """
 import pytest
 
+from oodi.codecs.constants import CodecFormat
 from oodi.codecs.formats.base import Codec
 from oodi.configuration import Configuration
 from oodi.exceptions import ConfigurationError
@@ -80,3 +81,19 @@ def test_configuration_loader_get_codec_valid_format_names(mock_empty_config_fil
     Test fetching codecs by known CodecFormat objects referenced by value (str)
     """
     assert isinstance(Configuration().get_codec(valid_codec_format_name), Codec)
+
+
+# pylint: disable=unused-argument
+def test_configuration_loader_get_codec_formats_all(mock_empty_config_file) -> None:
+    """
+    Test fetching codec formats without specifying a codec format
+    """
+    assert len(Configuration().get_codec_formats()) == len(CodecFormat)
+
+
+# pylint: disable=unused-argument
+def test_configuration_loader_get_codec_formats_named(mock_empty_config_file, valid_codec_format_name) -> None:
+    """
+    Test fetching codec formats without specifying a codec format
+    """
+    assert len(Configuration().get_codec_formats([valid_codec_format_name])) == 1
