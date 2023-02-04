@@ -18,7 +18,8 @@ ${VENV_BIN}:
 virtualenv: ${VENV_BIN}
 
 clean:
-	@rm -rf build dist .DS_Store .pytest_cache .cache .eggs .coverage coverage.xml public
+	@rm -rf build dist .DS_Store .pytest_cache .cache .eggs .coverage \
+		coverage.lcov coverage.xml public
 	@find . -name '__pycache__' -print0 | xargs -0r rm -rf
 	@find . -name '*.egg-info' -print0 | xargs -0r rm -rf
 	@find . -name '*.pyc' -print0 | xargs -0r rm -rf
@@ -40,6 +41,7 @@ doc: virtualenv
 
 unittest: virtualenv
 	source ${VENV_BIN}/activate && poetry run coverage run --source "${MODULE}" --module pytest
+	source ${VENV_BIN}/activate && poetry run coverage lcov
 	source ${VENV_BIN}/activate && poetry run coverage html
 	source ${VENV_BIN}/activate && poetry run coverage report
 
