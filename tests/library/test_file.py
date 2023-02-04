@@ -8,6 +8,8 @@ from oodi.codecs.formats.base import Codec
 from oodi.configuration import Configuration
 from oodi.library.file import AudioFile
 
+from ..utils import object_rich_compare
+
 MOCK_FILENAME = ''
 MOCK_OTHER_FILE_NAME = 'A first sorting audiofile.wav'
 
@@ -49,13 +51,4 @@ def test_audio_file_rich_comparison(mock_empty_config, mock_sample_file):
     """
     a = AudioFile(mock_empty_config, path=Path(mock_sample_file.parent, MOCK_OTHER_FILE_NAME))
     b = AudioFile(mock_empty_config, mock_sample_file)
-
-    assert a == a  # pylint: disable=comparison-with-itself
-    assert a != b
-
-    assert a < b
-    assert a <= b
-    assert a <= a  # pylint: disable=comparison-with-itself
-    assert b > a
-    assert b >= a
-    assert b >= b  # pylint: disable=comparison-with-itself
+    object_rich_compare(a, b)
