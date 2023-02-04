@@ -3,7 +3,7 @@ Unit tests for oodi.configuration.loader module
 """
 import pytest
 
-from oodi.metadata.constants import ALBUMART_SUPPORTED_FILENAMES
+from oodi.metadata.constants import ALBUMART_SUPPORTED_FILENAMES, BOOKLET_SUPPORTED_FILENAMES
 
 from ..conftest import MOCK_DATA
 
@@ -14,6 +14,11 @@ MOCK_ALBUMART_FILES = [
     path
     for path in MOCK_METADATA_FILES
     if path.name in ALBUMART_SUPPORTED_FILENAMES
+]
+MOCK_BOOKLET_FILES = [
+    path
+    for path in MOCK_METADATA_FILES
+    if path.name in BOOKLET_SUPPORTED_FILENAMES
 ]
 
 
@@ -29,5 +34,13 @@ def mock_metadata_file(request):
 def mock_albumart_file(request):
     """
     Mock fixture to list all available album art files in test data
+    """
+    yield request.param
+
+
+@pytest.fixture(params=MOCK_BOOKLET_FILES)
+def mock_booklet_file(request):
+    """
+    Mock fixture to list all available booklet files in test data
     """
     yield request.param
