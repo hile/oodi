@@ -18,6 +18,12 @@ class AudioFile:
     """
     Audio file optionally linked to an album and library
     """
+    config: 'Configuration'
+    library: Optional['Library']
+    album: Optional['Album']
+    path: Path
+    codec: Codec
+
     def __init__(self,
                  config: 'Configuration',
                  path: Path,
