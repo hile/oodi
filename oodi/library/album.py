@@ -23,7 +23,14 @@ class Album:
         self.metadata = []
 
     def __repr__(self) -> str:
-        return str(self.relative_path)
+        return str(self.path.resolve())
+
+    @property
+    def path(self) -> Path:
+        """
+        Return full filesystem path to the library album
+        """
+        return Path(self.library).joinpath(self.relative_path)
 
     def debug(self, *args: List[Any]) -> None:
         """
@@ -124,7 +131,7 @@ class AlbumPathLookup(MutableMapping):
         """
         self.library.message(*args)
 
-    def get_album_for_audio_file(self, item: 'LibraryItem') -> Album:
+    def get_album_for_file(self, item: 'LibraryItem') -> Album:
         """
         Return album for the folder of the specified audio file
         """

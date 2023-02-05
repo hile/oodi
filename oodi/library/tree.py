@@ -34,8 +34,7 @@ class LibraryItem(TreeItem):
 # pylint: disable=too-few-public-methods
 class LibraryCodecs:
     """
-    Link
-    Container to list codecs linked to a Library object based on the formats specified
+    Link list of codecs linked to a Library object based on the formats specified
     for the library
     """
     library: 'Library'
@@ -107,6 +106,7 @@ class Library(Tree):
                 filesystem_encoding: Optional[str] = None,
                 default_format: Optional[str] = None,
                 formats: Optional[List[str]] = None,
+                label: Optional[str] = None,
                 description: Optional[str] = None) -> None:
         path = Path(path).expanduser()
         if create_missing and not path.exists():
@@ -133,6 +133,9 @@ class Library(Tree):
         self.albums = albums if albums is not None else AlbumPathLookup(self)
         self.codecs = LibraryCodecs(self, default=default_format, formats=formats)
 
+        self.create_missing = create_missing
+        self.mode = mode
+
         self.label = label if label else ''
         self.description = description if description else ''
         self.excluded = list(excluded) if isinstance(excluded, (tuple, list)) else []
@@ -145,6 +148,28 @@ class Library(Tree):
             mode=mode,
             excluded=excluded
         )
+
+    def resolve(self, strict=False) -> 'Library':
+        """
+        Resolve library path returning a full filesystem path
+        """
+        clone = self.__class__(
+            path=Path(self).resolve(strict),
+            create_missing=self.create_missing,
+            sorted=self.sorted,
+            mode=self.mode,
+            excluded=self.excluded,
+            config=self.config,
+            library=self.library,
+            albums=self.albums,
+            filesystem_encoding=self.filesystem_encoding,
+            default_format=self.codecs.default.codec_format,
+            formats=[codec.codec_format for codec in self.codecs.formats],
+            label=self.label,
+            description=self.description,
+        )
+        clone.__items__ = self.__items__
+        return clone
 
     def __load_tree__(self, item) -> 'Library':
         """
@@ -159,13 +184,13 @@ class Library(Tree):
             albums=self.albums,
         )
 
-    def __load_file__(self, item: LibraryItem):
+    def __load_file__(self, item: LibraryItem) -> LibraryItem:
         """
         Load audio file to tree
         """
         item = super().__load_file__(item)
         if item.suffix in self.codecs.suffixes:
-            album = self.albums.get_album_for_audio_file(item)
+            album = self.albums.get_album_for_file(item)
             album.add_audio_file(item)
         return item
 
