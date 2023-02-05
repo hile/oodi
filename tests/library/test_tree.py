@@ -2,6 +2,7 @@
 Unit tests for oodi.library.library module
 """
 from pathlib import Path
+import os
 import pytest
 
 from oodi.exceptions import ConfigurationError
@@ -10,9 +11,15 @@ from oodi.codecs.formats.base import Codec
 from oodi.library.tree import Library, LibraryItem
 
 from ..conftest import (
-    MOCK_MESSAGE,
     MOCK_WHITENOISE_SAMPLES_COUNT,
     MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
+)
+from ..utils import (
+    validate_debug_disabled,
+    validate_debug_enabled,
+    validate_error_debug_disabled,
+    validate_message_silent_disabled,
+    validate_message_silent_enabled,
 )
 
 
@@ -114,15 +121,23 @@ def test_library_loader_sample_library_relative_path(mock_sample_library) -> Non
             assert isinstance(item.library_relative_path, Path)
 
 
+def test_library_loader_resolve(mock_sample_library) -> None:
+    """
+    Test that resolve() method of Library object returns a library object
+    with a full resolved path
+    """
+    cloned = mock_sample_library.resolve()
+    assert str(cloned).startswith(os.sep)
+    assert mock_sample_library.albums == cloned.albums
+    assert mock_sample_library.__items__ == cloned.__items__
+
+
 def test_library_debug_disabled(mock_sample_library, capsys):
     """
     Test library debug method with debugging disabled
     """
     assert mock_sample_library.config.__debug_enabled__ is False
-    mock_sample_library.debug(MOCK_MESSAGE, mock_sample_library)
-    captured = capsys.readouterr()
-    assert captured.out == ''
-    assert captured.err == ''
+    validate_debug_disabled(mock_sample_library, capsys)
 
 
 def test_library_debug_enabled(mock_sample_library, capsys):
@@ -130,10 +145,7 @@ def test_library_debug_enabled(mock_sample_library, capsys):
     Test library debug method with debugging enabled
     """
     mock_sample_library.config.__debug_enabled__ = True
-    mock_sample_library.debug(MOCK_MESSAGE, mock_sample_library)
-    captured = capsys.readouterr()
-    assert captured.out == ''
-    assert len(captured.err.splitlines()) == 1
+    validate_debug_enabled(mock_sample_library, capsys)
 
 
 def test_library_error_message(mock_sample_library, capsys):
@@ -141,10 +153,7 @@ def test_library_error_message(mock_sample_library, capsys):
     Test library error method with debugging disabled
     """
     assert mock_sample_library.config.__debug_enabled__ is False
-    mock_sample_library.error(MOCK_MESSAGE, mock_sample_library)
-    captured = capsys.readouterr()
-    assert captured.out == ''
-    assert len(captured.err.splitlines()) == 1
+    validate_error_debug_disabled(mock_sample_library, capsys)
 
 
 def test_library_message_silent_disabled(mock_sample_library, capsys):
@@ -152,10 +161,7 @@ def test_library_message_silent_disabled(mock_sample_library, capsys):
     Test library debug method with silent flag disabled
     """
     assert mock_sample_library.config.__silent__ is False
-    mock_sample_library.message(MOCK_MESSAGE, mock_sample_library)
-    captured = capsys.readouterr()
-    assert captured.err == ''
-    assert len(captured.out.splitlines()) == 1
+    validate_message_silent_disabled(mock_sample_library, capsys)
 
 
 def test_library_message_silent_enabled(mock_sample_library, capsys):
@@ -163,7 +169,4 @@ def test_library_message_silent_enabled(mock_sample_library, capsys):
     Test library debug method with silent flag enabled
     """
     mock_sample_library.config.__silent__ = True
-    mock_sample_library.message(MOCK_MESSAGE, mock_sample_library)
-    captured = capsys.readouterr()
-    assert captured.err == ''
-    assert captured.out == ''
+    validate_message_silent_enabled(mock_sample_library, capsys)
