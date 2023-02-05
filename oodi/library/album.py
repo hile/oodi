@@ -5,6 +5,8 @@ from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any, Iterator, List, Optional, Union, TYPE_CHECKING
 
+from ..metadata.formats.base import Metadata
+from ..metadata.loader import AlbumMetadata
 from .file import AudioFile
 
 if TYPE_CHECKING:
@@ -20,7 +22,7 @@ class Album:
         self.library = library
         self.relative_path = relative_path
         self.audio_files = []
-        self.metadata = []
+        self.metadata = AlbumMetadata(self)
 
     def __repr__(self) -> str:
         return str(self.path.resolve())
@@ -67,11 +69,11 @@ class Album:
             self.audio_files.append(audio_file)
         return audio_file
 
-    def add_metadata_file(self, metadata_file: Union['LibraryItem', Path]) -> 'LibraryItem':
+    def add_metadata_file(self, metadata_file: Union['LibraryItem', Path]) -> Metadata:
         """
         Add a metadata file to the album
         """
-        self.metadata.append(metadata_file)
+        return self.metadata.add_metadata_file(metadata_file)
 
 
 class AlbumPathLookup(MutableMapping):
@@ -133,7 +135,7 @@ class AlbumPathLookup(MutableMapping):
 
     def get_album_for_file(self, item: 'LibraryItem') -> Album:
         """
-        Return album for the folder of the specified audio file
+        Return album for the folder of the specified audio or metadata file
         """
         album_relative_path = str(Path(item.relative_to(self.library).parent))
         try:

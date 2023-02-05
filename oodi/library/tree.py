@@ -11,6 +11,7 @@ from pathlib_tree.tree import Tree, TreeItem
 from ..exceptions import ConfigurationError
 from ..codecs.constants import DEFAULT_AUDIO_CODEC_FORMAT
 from ..codecs.formats.base import Codec
+from ..metadata.constants import ALBUMART_FILENAME_SUFFIXES, BOOKLET_FILENAME_SUFFIXES
 
 from .album import AlbumPathLookup
 from .file import AudioFile
@@ -29,6 +30,27 @@ class LibraryItem(TreeItem):
     def __init__(self, path: Path, config: Optional['Configuration'] = None) -> None:
         self.config = config
         TreeItem.__init__(self)
+
+
+# pylint: disable=too-few-public-methods
+class LibraryMetadata:
+    """
+    List of library metadata loader details for the library
+    """
+    def __init__(self, library: 'Library') -> None:
+        self.library = library
+
+    @property
+    def suffixes(self) -> List[str]:
+        """
+        Return list of filename suffixes for metadata files
+        """
+        return [
+            f""".{suffix.lstrip('.')}"""
+            for suffix in sorted(set(itertools.chain(
+                *[ALBUMART_FILENAME_SUFFIXES + BOOKLET_FILENAME_SUFFIXES]
+            )))
+        ]
 
 
 # pylint: disable=too-few-public-methods
@@ -80,6 +102,7 @@ class Library(Tree):
     __file_loader_class__ = LibraryItem
 
     config: 'Configuration'
+    metadata: LibraryMetadata
     codecs: LibraryCodecs
     albums: AlbumPathLookup
     label: str
@@ -132,6 +155,7 @@ class Library(Tree):
         self.library = library if library is not None else self
         self.albums = albums if albums is not None else AlbumPathLookup(self)
         self.codecs = LibraryCodecs(self, default=default_format, formats=formats)
+        self.metadata = LibraryMetadata(self)
 
         self.create_missing = create_missing
         self.mode = mode
@@ -192,6 +216,9 @@ class Library(Tree):
         if item.suffix in self.codecs.suffixes:
             album = self.albums.get_album_for_file(item)
             album.add_audio_file(item)
+        if item.suffix in self.metadata.suffixes:
+            album = self.albums.get_album_for_file(item)
+            album.add_metadata_file(item)
         return item
 
     @property

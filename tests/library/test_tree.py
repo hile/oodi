@@ -12,7 +12,8 @@ from oodi.library.tree import Library, LibraryItem
 
 from ..conftest import (
     MOCK_WHITENOISE_SAMPLES_COUNT,
-    MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
+    MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT,
+    MOCK_METADATA_FILES_COUNT
 )
 from ..utils import (
     validate_debug_disabled,
@@ -99,7 +100,9 @@ def test_library_loader_sample_library_load(mock_sample_library) -> None:
     """
     mock_sample_library.load()
     items = list(mock_sample_library)
-    assert len(items) == MOCK_WHITENOISE_SAMPLES_COUNT + MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT
+    assert len(items) == MOCK_WHITENOISE_SAMPLES_COUNT + \
+        MOCK_WHITENOISE_SAMPLES_FOLDER_COUNT + \
+        MOCK_METADATA_FILES_COUNT
     for item in items:
         if item.is_file():
             assert isinstance(item, LibraryItem)

@@ -5,6 +5,14 @@ import itertools
 from enum import Enum
 
 
+class MetadataFile(Enum):
+    """
+    Supported metadata file types
+    """
+    ALBUMART = 'AlbumArt'
+    BOOKLET = 'Booklet'
+
+
 class AlbumartFormat(Enum):
     """
     Supported formats for AlbumArt files

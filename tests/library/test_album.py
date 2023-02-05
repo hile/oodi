@@ -17,11 +17,8 @@ def test_album_properties(mock_empty_library, mock_album_relative_path, mock_alb
     assert isinstance(mock_album.__repr__(), str)
     assert mock_album.relative_path.relative_to(mock_empty_library) == mock_album_relative_path
     assert len(mock_album.audio_files) == 0
-    assert len(mock_album.metadata) == 0
-
-    mock_album.add_metadata_file(__file__)
-    assert len(mock_album.audio_files) == 0
-    assert len(mock_album.metadata) == 1
+    assert len(mock_album.metadata.albumart) == 0
+    assert len(mock_album.metadata.booklets) == 0
 
 
 def test_album_add_audio_file(mock_album, mock_sample_file):
