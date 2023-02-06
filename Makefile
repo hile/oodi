@@ -9,7 +9,7 @@ PIP := ${VENV_DIR}/bin/pip
 SPHINX_FLAGS := -b html ./docs public
 SPHINX_WEBSITE_FLAGS := --port 8100 --host localhost --open-browser --watch ${MODULE}
 
-all: lint unittest
+all: unittest coverage lint
 
 ${VENV_BIN}:
 	python3 -m venv ${VENV_DIR}
@@ -41,6 +41,8 @@ doc: virtualenv
 
 unittest: virtualenv
 	source ${VENV_BIN}/activate && poetry run coverage run --source "${MODULE}" --module pytest
+
+coverage: virtualenv
 	source ${VENV_BIN}/activate && poetry run coverage lcov
 	source ${VENV_BIN}/activate && poetry run coverage html
 	source ${VENV_BIN}/activate && poetry run coverage report
